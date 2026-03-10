@@ -7,8 +7,8 @@
 <!-- Open Graph tags for WhatsApp / social preview -->
 <meta property="og:title"       content="ArqueoLog — Field Documentation System">
 <meta property="og:description" content="Archaeology field log & team collaboration tool. Log entries, chrono notes, and live sync.">
-<meta property="og:image"       content="https://Chabran.github.io/Arqueo-log/arqueo-thumb.png">
-<meta property="og:url"         content="https://Chabran.github.io/Arqueo-log">
+<meta property="og:image"       content="https://yourusername.github.io/archaeolog/arqueo-thumb.png">
+<meta property="og:url"         content="https://yourusername.github.io/archaeolog">
 <meta property="og:type"        content="website">
 <meta name="twitter:card"       content="summary_large_image">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -1991,10 +1991,11 @@
     body.innerHTML = notes.map(n => {
       const t = fmtNoteTs(n.ts);
       const safe = n.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const initials = (n.author || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,3);
       return `<div class="note-entry" id="note-${n.id}">
         <div class="note-ts">
           <span class="note-ts-main">${t.display}</span>
-          <span class="note-ts-sub">${t.mil}</span>
+          <span class="note-ts-sub" title="${n.author || 'Unknown'}">${initials}</span>
           <span class="note-ts-date">${t.date}</span>
         </div>
         <div class="note-body" id="note-body-${n.id}">${safe}</div>
