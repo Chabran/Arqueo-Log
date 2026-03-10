@@ -1,0 +1,2364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Report — Archaeology Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #e8dcc8;
+    --sand-dark: #d4c5a9;
+    --earth: #8b6f47;
+    --earth-dark: #6b5235;
+    --sienna: #c4622d;
+    --sienna-light: #e07848;
+    --ink: #2a1f14;
+    --ink-light: #4a3728;
+    --parchment: #f5edd8;
+    --parchment-dark: #ede0c4;
+    --stone: #9a8c7a;
+    --moss: #5a6b3a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--ink);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, #3a2a1a 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, #2a1a0a 0%, transparent 50%);
+  }
+
+  .app-wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* HEADER */
+  .site-header {
+    text-align: center;
+    padding: 32px 0 28px;
+    position: relative;
+  }
+
+  .site-header::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--sienna), var(--earth), var(--sienna), transparent);
+    margin-top: 20px;
+  }
+
+  .header-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 8px;
+  }
+
+  .site-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 5vw, 38px);
+    font-weight: 700;
+    color: var(--parchment);
+    letter-spacing: 0.02em;
+  }
+
+  .site-title span {
+    color: var(--sienna-light);
+  }
+
+  .header-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--stone);
+    margin-top: 6px;
+    letter-spacing: 0.15em;
+  }
+
+  /* TABS */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    margin: 28px 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .tab-btn:first-child { border-radius: 6px 0 0 0; }
+  .tab-btn:last-child  { border-radius: 0 6px 0 0; }
+  .tab-btn:not(:first-child):not(:last-child) { border-radius: 0; }
+
+  .tab-btn.inactive {
+    background: #3a2a1a;
+    color: var(--stone);
+    border-bottom: 2px solid #4a3a2a;
+  }
+
+  .tab-btn.inactive:hover {
+    background: #4a3a2a;
+    color: var(--parchment);
+  }
+
+  .tab-btn.active {
+    background: var(--parchment);
+    color: var(--earth-dark);
+    border-bottom: 2px solid var(--parchment);
+  }
+
+  /* Shadow appears on the tab row when it sticks */
+  .tab-nav.is-sticky {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  .entry-count-badge {
+    display: inline-block;
+    background: var(--sienna);
+    color: white;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 9px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--parchment);
+    border-radius: 0 0 8px 8px;
+    padding: 32px;
+    min-height: 500px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  /* NEW ENTRY PANEL */
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--earth-dark);
+    margin-bottom: 4px;
+  }
+
+  .panel-subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--stone);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--earth-dark);
+    font-weight: 500;
+  }
+
+  input[type="text"], input[type="date"], input[type="time"], select, textarea {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 5px;
+    background: var(--parchment);
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--sienna);
+    box-shadow: 0 0 0 3px rgba(196, 98, 45, 0.15);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+  }
+
+  .weather-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--sand-dark), transparent);
+    margin: 20px 0;
+  }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--sienna);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--sand-dark);
+  }
+
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  /* COMBO DROPDOWN (project/site name) */
+  .combo-wrapper {
+    position: relative;
+  }
+
+  .combo-wrapper input {
+    width: 100%;
+    padding-right: 36px;
+  }
+
+  .combo-toggle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 34px;
+    background: var(--sand-dark);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--earth-dark);
+    transition: background 0.15s;
+  }
+
+  .combo-toggle:hover {
+    background: var(--earth);
+    color: white;
+  }
+
+  .combo-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--parchment);
+    border: 1.5px solid var(--sand-dark);
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    z-index: 100;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .combo-dropdown.open { display: block; }
+
+  .combo-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--ink);
+    transition: background 0.1s;
+    gap: 8px;
+  }
+
+  .combo-option:hover {
+    background: var(--sand);
+  }
+
+  .combo-option-text { flex: 1; }
+
+  .combo-option-delete {
+    background: none;
+    border: none;
+    color: var(--stone);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .combo-option-delete:hover {
+    color: #c0392b;
+    background: rgba(192,57,43,0.08);
+  }
+
+  .combo-option.new-entry {
+    color: var(--sienna);
+    font-style: italic;
+    border-top: 1px solid var(--sand-dark);
+  }
+
+  .combo-option.new-entry:hover {
+    background: rgba(196, 98, 45, 0.08);
+  }
+
+  .field-required-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--sienna);
+    letter-spacing: 0.1em;
+    margin-top: 3px;
+    display: none;
+  }
+
+  .field-required-hint.show { display: block; }
+
+  /* FINDINGS TABLE in report cards */
+  .findings-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    font-size: 14px;
+  }
+
+  .findings-report-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--stone);
+    padding: 6px 10px;
+    background: var(--sand);
+    text-align: left;
+    border: 1px solid var(--sand-dark);
+  }
+
+  .findings-report-table td {
+    padding: 8px 10px;
+    border: 1px solid var(--sand-dark);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    vertical-align: top;
+  }
+
+  .findings-report-table tr:nth-child(even) td {
+    background: rgba(232, 220, 200, 0.3);
+  }
+
+  .findings-report-table .finding-num-cell {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--sienna);
+    white-space: nowrap;
+    width: 60px;
+  }
+  .bag-number-wrapper {
+    position: relative;
+  }
+
+  .bag-number-wrapper input {
+    padding-right: 80px;
+  }
+
+  .bag-auto-label {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--moss);
+    background: var(--parchment);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--moss);
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  /* FINDINGS ROWS */
+  .findings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .finding-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+    padding: 12px 14px;
+    background: var(--sand);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 6px;
+    position: relative;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .finding-row-num {
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    color: var(--sienna);
+    background: var(--parchment);
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--sand-dark);
+    text-transform: uppercase;
+  }
+
+  .btn-remove-finding {
+    background: transparent;
+    border: 1.5px solid var(--sand-dark);
+    color: var(--stone);
+    width: 34px;
+    height: 34px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    align-self: end;
+  }
+
+  .btn-remove-finding:hover {
+    background: #c0392b;
+    border-color: #c0392b;
+    color: white;
+  }
+
+  .btn-add-finding {
+    background: transparent;
+    color: var(--earth);
+    border: 1.5px dashed var(--earth);
+    padding: 10px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .btn-add-finding:hover {
+    background: var(--earth);
+    border-style: solid;
+    color: white;
+  }
+
+  .btn-primary {
+    background: var(--sienna);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    font-weight: 500;
+  }
+
+  .btn-primary:hover {
+    background: var(--sienna-light);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--earth);
+    border: 1.5px solid var(--earth);
+    padding: 10px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover {
+    background: var(--earth);
+    color: white;
+  }
+
+  .btn-danger {
+    background: transparent;
+    color: #c0392b;
+    border: 1.5px solid #c0392b;
+    padding: 6px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-danger:hover {
+    background: #c0392b;
+    color: white;
+  }
+
+  .form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .toast {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--moss);
+    color: white;
+    border-radius: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .toast.show { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* LATEST ENTRY PREVIEW */
+  .latest-preview {
+    margin-top: 28px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .latest-preview-header {
+    background: var(--sand);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .latest-preview-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--earth-dark);
+  }
+
+  .latest-preview-body {
+    padding: 20px;
+  }
+
+  /* REPORT PANEL */
+  .report-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .report-controls select {
+    max-width: 200px;
+  }
+
+  .report-document {
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .report-header {
+    background: var(--earth-dark);
+    color: var(--parchment);
+    padding: 28px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .report-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      rgba(255,255,255,0.02) 10px,
+      rgba(255,255,255,0.02) 20px
+    );
+  }
+
+  .report-header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    position: relative;
+  }
+
+  .report-header-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    opacity: 0.7;
+    margin-top: 6px;
+    position: relative;
+  }
+
+  .report-body {
+    padding: 24px 32px;
+  }
+
+  .report-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: var(--sand);
+    border-radius: 5px;
+  }
+
+  .summary-stat {
+    text-align: center;
+  }
+
+  .summary-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--sienna);
+    line-height: 1;
+  }
+
+  .summary-stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-top: 4px;
+  }
+
+  .entry-card {
+    border: 1px solid var(--sand-dark);
+    border-radius: 6px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .entry-card-header {
+    background: var(--sand);
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .entry-card-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--sienna);
+    text-transform: uppercase;
+  }
+
+  .entry-card-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--stone);
+  }
+
+  .entry-card-body {
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .entry-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .entry-field-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+
+  .entry-field-value {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .entry-field.full {
+    grid-column: 1 / -1;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--stone);
+  }
+
+  .empty-state-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .empty-state-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .print-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--stone);
+    text-align: right;
+    margin-top: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── CHRONOLOGICAL NOTES ───────────────────────────────── */
+  .notes-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    margin-bottom: 24px;
+  }
+
+  .notes-textarea {
+    flex: 1;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 5px;
+    background: var(--parchment);
+    color: var(--ink);
+    resize: vertical;
+    min-height: 88px;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .notes-textarea:focus {
+    border-color: var(--sienna);
+    box-shadow: 0 0 0 3px rgba(196,98,45,0.15);
+  }
+
+  .notes-textarea::placeholder { color: var(--stone); font-style: italic; }
+
+  .btn-log-note {
+    background: var(--earth-dark);
+    color: var(--parchment);
+    border: none;
+    padding: 12px 22px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+    align-self: flex-end;
+  }
+
+  .btn-log-note:hover { background: var(--earth); }
+  .btn-log-note:active { transform: scale(0.97); }
+
+  .notes-display {
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .notes-display-header {
+    background: var(--earth-dark);
+    padding: 11px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .notes-display-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--sand);
+  }
+
+  .notes-display-actions { display: flex; gap: 8px; }
+
+  .btn-notes-action {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: var(--sand);
+    padding: 5px 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-notes-action:hover { background: rgba(255,255,255,0.2); }
+  .btn-notes-action.copied { background: var(--moss); border-color: var(--moss); }
+
+  .notes-display-body {
+    max-height: 520px;
+    overflow-y: auto;
+  }
+
+  .note-entry {
+    display: flex;
+    border-bottom: 1px solid var(--sand-dark);
+    animation: noteIn 0.22s ease;
+  }
+
+  @keyframes noteIn {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .note-entry:last-child { border-bottom: none; }
+
+  .note-ts {
+    flex-shrink: 0;
+    width: 140px;
+    padding: 13px 14px;
+    background: var(--sand);
+    border-right: 1px solid var(--sand-dark);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .note-ts-main {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sienna);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .note-ts-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--stone);
+    letter-spacing: 0.08em;
+  }
+
+  .note-ts-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-top: 2px;
+  }
+
+  .note-body {
+    flex: 1;
+    padding: 13px 17px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .note-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 8px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    align-self: flex-start;
+  }
+
+  .note-entry:hover .note-actions { opacity: 1; }
+
+  .note-action-btn {
+    background: none;
+    border: 1px solid var(--sand-dark);
+    border-radius: 3px;
+    color: var(--stone);
+    padding: 3px 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    white-space: nowrap;
+  }
+
+  .note-action-btn:hover { background: var(--sand); color: var(--ink); border-color: var(--stone); }
+  .note-action-btn.del:hover { background: #fdecea; color: #c0392b; border-color: #c0392b; }
+
+  .note-edit-area {
+    display: none;
+    padding: 0 17px 13px 17px;
+  }
+
+  .note-edit-area.open { display: block; }
+
+  .note-edit-textarea {
+    width: 100%;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13.5px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--sienna);
+    border-radius: 4px;
+    background: var(--parchment);
+    color: var(--ink);
+    resize: vertical;
+    min-height: 70px;
+    line-height: 1.6;
+    outline: none;
+  }
+
+  .note-edit-btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .note-save-btn {
+    background: var(--earth-dark);
+    color: var(--parchment);
+    border: none;
+    padding: 5px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .note-cancel-btn {
+    background: none;
+    border: 1px solid var(--sand-dark);
+    color: var(--stone);
+    padding: 5px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .notes-empty {
+    padding: 44px 20px;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+
+  /* ── REPORT FIELD HIGHLIGHTS ───────────────────────────── */
+  .field-highlight-project .entry-field-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--earth-dark);
+  }
+
+  .field-highlight-bag .entry-field-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--sienna);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── SYNC STATUS ────────────────────────────────────────── */
+  .sync-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 6px 0 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+
+  .sync-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--stone);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+
+  .sync-dot.live    { background: #5a9e5a; }
+  .sync-dot.saving  { background: var(--sienna); animation: pulse 0.8s infinite; }
+  .sync-dot.offline { background: #c0392b; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  /* ── USER NAME PROMPT ───────────────────────────────────── */
+  .name-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,12,5,0.85);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .name-card {
+    background: var(--parchment);
+    border-radius: 8px;
+    padding: 32px 28px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    text-align: center;
+  }
+
+  .name-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--earth-dark);
+    margin-bottom: 6px;
+  }
+
+  .name-card p {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    color: var(--stone);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .name-card input {
+    width: 100%;
+    padding: 11px 14px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 5px;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 4px;
+    box-sizing: border-box;
+  }
+
+  .name-card input:focus { border-color: var(--sienna); }
+
+  .overlay-err {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--sienna);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
+  .name-card button {
+    width: 100%;
+    padding: 12px;
+    background: var(--earth-dark);
+    color: var(--parchment);
+    border: none;
+    border-radius: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  @media print {
+    body { background: white; }
+    .tab-nav, .report-controls, .btn-primary, .btn-secondary, .print-hint, .site-header { display: none !important; }
+    .panel { box-shadow: none; padding: 0; }
+    .app-wrapper { max-width: 100%; padding: 0; }
+  }
+
+  /* ── RESPONSIVE ─────────────────────────────────────────── */
+  @media (max-width: 640px) {
+
+    .app-wrapper { padding: 12px 10px 48px; }
+
+    /* Header */
+    .site-header { padding: 20px 0 18px; }
+    .site-title { font-size: 28px; }
+    .header-eyebrow { font-size: 8px; letter-spacing: 0.18em; }
+
+    /* Tabs — stack labels tighter, drop letter-spacing */
+    .tab-nav { margin: 16px 0 0; }
+    .tab-btn {
+      padding: 11px 6px;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+    .entry-count-badge { margin-left: 4px; padding: 1px 5px; font-size: 8px; }
+
+    /* Panel */
+    .panel { padding: 18px 14px; border-radius: 0 0 6px 6px; }
+    .panel-title { font-size: 17px; }
+    .panel-subtitle { font-size: 9px; margin-bottom: 18px; }
+
+    /* Form grid → single column */
+    .form-grid, .weather-grid, .findings-grid { grid-template-columns: 1fr; }
+
+    /* Findings row — stack vertically */
+    .finding-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .finding-row-num { grid-column: 1; }
+
+    /* Notes */
+    .notes-input-row { flex-direction: column; gap: 8px; }
+    .btn-log-note { width: 100%; text-align: center; }
+    .note-ts { width: 110px; padding: 10px 10px; }
+    .note-ts-main { font-size: 11px; }
+    .note-ts-sub { font-size: 8px; }
+    .note-ts-date { font-size: 7px; }
+    .note-body { font-size: 12.5px; padding: 10px 12px; }
+    .notes-display-header { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+    .notes-display-title { font-size: 9px; }
+    .btn-notes-action { padding: 5px 9px; font-size: 8px; }
+
+    /* Report controls */
+    .report-controls { flex-wrap: wrap; gap: 8px; }
+    .report-controls > div { flex: 0 0 100%; }
+    .report-controls .btn-secondary,
+    .report-controls .btn-danger { padding: 8px 12px; font-size: 9px; }
+
+    /* Report summary stats */
+    .report-summary-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
+    .summary-stat-num { font-size: 22px; }
+    .summary-stat-label { font-size: 8px; }
+
+    /* Entry cards */
+    .entry-card-body { grid-template-columns: 1fr; }
+    .entry-card-header { padding: 10px 12px; gap: 6px; }
+    .entry-card-body { padding: 12px; }
+
+    /* Form actions */
+    .form-actions > div { flex-wrap: wrap; }
+    .btn-primary, .btn-secondary { width: 100%; text-align: center; box-sizing: border-box; }
+
+    /* Latest preview */
+    .latest-preview { padding: 14px; }
+
+    /* Combo dropdowns */
+    .combo-dropdown { font-size: 13px; }
+  }
+
+  @media (max-width: 400px) {
+    .tab-btn { font-size: 8px; padding: 10px 4px; letter-spacing: 0.04em; }
+    .note-ts { width: 95px; }
+  }
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+
+  <header class="site-header">
+    <div class="header-eyebrow">Field Documentation System</div>
+    <h1 class="site-title">Arch<span>æ</span>o Log</h1>
+    <div class="header-meta" id="headerDate">—</div>
+  </header>
+
+  <!-- SYNC STATUS BAR -->
+  <div class="sync-bar" id="syncBar">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncLabel">Connecting…</span>
+  </div>
+
+  <!-- NAME PROMPT OVERLAY -->
+  <div class="name-overlay" id="nameOverlay" style="display:none">
+    <div class="name-card">
+      <h2>Welcome to ArchæoLog</h2>
+      <p>Enter your name and the team passphrase to join your colleagues' shared workspace.</p>
+      <input type="text" id="userNameInput" placeholder="Your name  e.g. J. Rivera" maxlength="40" autocomplete="name">
+      <span class="overlay-err" id="nameErr" style="display:none">⚑ Please enter your name</span>
+      <input type="password" id="userPassInput" placeholder="Team passphrase" maxlength="80" autocomplete="off">
+      <span class="overlay-err" id="passErr" style="display:none">⚑ Please enter the passphrase</span>
+      <button onclick="submitUserName()">Start Field Work →</button>
+    </div>
+  </div>
+
+  <nav class="tab-nav">
+    <button class="tab-btn inactive" id="tabNotes" onclick="switchTab('notes')">
+      ✎ Chrono Notes
+    </button>
+    <button class="tab-btn active" id="tabEntry" onclick="switchTab('entry')">
+      ✦ New Entry
+    </button>
+    <button class="tab-btn inactive" id="tabReport" onclick="switchTab('report')">
+      ⊞ Discoveries <span class="entry-count-badge" id="entryBadge">0</span>
+    </button>
+  </nav>
+
+  <!-- CHRONOLOGICAL NOTES PANEL -->
+  <div class="panel" id="panelNotes" style="display:none">
+    <h2 class="panel-title">Chronological Notes</h2>
+    <p class="panel-subtitle">Time-stamped field notes — logged as you work</p>
+
+    <div class="notes-input-row">
+      <textarea class="notes-textarea" id="noteInput" placeholder="Type a note — an observation, a decision, a reminder… Ctrl+Enter to save."></textarea>
+      <button class="btn-log-note" onclick="logNote()">Log Note ↵</button>
+    </div>
+
+    <div class="notes-display">
+      <div class="notes-display-header">
+        <span class="notes-display-title" id="notesDisplayTitle">◈ Field Log</span>
+        <div class="notes-display-actions">
+          <button class="btn-notes-action" id="copyNotesBtn" onclick="copyNotes()">⎘ Copy All</button>
+          <button class="btn-notes-action" onclick="printNotes()">⎙ Print PDF</button>
+        </div>
+      </div>
+      <div class="notes-display-body" id="notesBody">
+        <div class="notes-empty">No notes yet — start logging above</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW ENTRY PANEL -->
+  <div class="panel" id="panelEntry">
+    <h2 class="panel-title">Field Entry</h2>
+    <p class="panel-subtitle">Document your observations, finds, and site conditions</p>
+
+    <div class="section-label">Location & Time</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="projectName">Project Name <span style="color:var(--sienna)">*</span></label>
+        <div class="combo-wrapper" id="projectComboWrapper">
+          <input type="text" id="projectName" placeholder="e.g. New project name" autocomplete="off" oninput="filterCombo('project')" onfocus="openCombo('project')" onblur="delayCloseCombo('project')">
+          <button type="button" class="combo-toggle" onmousedown="toggleCombo(event,'project')">▾</button>
+          <div class="combo-dropdown" id="projectDropdown"></div>
+        </div>
+        <span class="field-required-hint" id="projectRequiredHint">⚑ Project name is required</span>
+      </div>
+      <div class="form-group">
+        <label for="siteName">Site Name <span style="color:var(--sienna)">*</span></label>
+        <div class="combo-wrapper" id="siteComboWrapper">
+          <input type="text" id="siteName" placeholder="e.g. San Juan, Sector B" autocomplete="off" oninput="filterCombo('site')" onfocus="openCombo('site')" onblur="delayCloseCombo('site')">
+          <button type="button" class="combo-toggle" onmousedown="toggleCombo(event,'site')">▾</button>
+          <div class="combo-dropdown" id="siteDropdown"></div>
+        </div>
+        <span class="field-required-hint" id="siteRequiredHint">⚑ Site name is required</span>
+      </div>
+      <div class="form-group">
+        <label for="gridRef">Grid Reference / Trench</label>
+        <input type="text" id="gridRef" placeholder="e.g. G-14 / Trench 3">
+      </div>
+      <div class="form-group">
+        <label for="entryDate">Date</label>
+        <input type="date" id="entryDate">
+      </div>
+      <div class="form-group">
+        <label for="entryTime">Time</label>
+        <input type="time" id="entryTime">
+      </div>
+      <div class="form-group">
+        <label for="depth">Depth / Layer (cm)</label>
+        <input type="text" id="depth" placeholder="e.g. 30–45 cm / Layer IIa">
+      </div>
+      <div class="form-group">
+        <label for="bagNumber">Bag Number <span style="color:var(--sienna)">*</span></label>
+        <div class="bag-number-wrapper">
+          <input type="text" id="bagNumber" placeholder="—">
+          <span class="bag-auto-label" id="bagAutoLabel" style="display:none">auto</span>
+        </div>
+        <span class="field-required-hint" id="bagRequiredHint">⚑ Bag number is required</span>
+      </div>
+      <div class="form-group">
+        <label for="recorder">Recorded By</label>
+        <input type="text" id="recorder" placeholder="e.g. J. Rivera">
+      </div>
+    </div>
+
+    <!-- WEATHER & CONDITIONS TEMPLATE — reserved for future tab (v1.2+)
+    <div class="divider"></div>
+    <div class="section-label">Weather & Conditions</div>
+    <div class="weather-grid">
+      <div class="form-group">
+        <label for="weather">Weather</label>
+        <select id="weather">
+          <option value="">Select...</option>
+          <option>Clear / Sunny</option>
+          <option>Partly Cloudy</option>
+          <option>Overcast</option>
+          <option>Light Rain</option>
+          <option>Heavy Rain</option>
+          <option>Windy</option>
+          <option>Hot & Dry</option>
+          <option>Foggy</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="temp">Temperature (°C)</label>
+        <input type="text" id="temp" placeholder="e.g. 28">
+      </div>
+      <div class="form-group">
+        <label for="soilCondition">Soil Condition</label>
+        <select id="soilCondition">
+          <option value="">Select...</option>
+          <option>Dry / Friable</option>
+          <option>Moist</option>
+          <option>Wet / Saturated</option>
+          <option>Compacted</option>
+          <option>Sandy</option>
+          <option>Clay-heavy</option>
+          <option>Mixed</option>
+        </select>
+      </div>
+    </div>
+    END WEATHER TEMPLATE -->
+
+    <div class="divider"></div>
+    <div class="section-label">Findings & Observations</div>
+
+    <div class="findings-list" id="findingsList"></div>
+    <button class="btn-add-finding" onclick="addFindingRow()">+ Add Finding</button>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label for="observations">Field Observations</label>
+      <textarea id="observations" placeholder="e.g. Encountered dense ceramic scatter at 35 cm, possible midden deposit. Several sherds show red-slip decoration consistent with earlier layers. Soil transitions from sandy loam to compacted clay."></textarea>
+    </div>
+
+    <!-- NEXT STEPS TEMPLATE — reserved for future tab (v1.3+)
+    <div class="form-group">
+      <label for="nextSteps">Recommended Next Steps</label>
+      <textarea id="nextSteps" placeholder="e.g. Extend trench 50 cm east to follow ceramic scatter. Flag feature for senior review before continuing excavation." style="min-height:80px"></textarea>
+    </div>
+    END NEXT STEPS TEMPLATE -->
+
+    <div class="form-actions">
+      <div class="toast" id="successToast">✓ Entry saved to report</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn-secondary" onclick="clearForm()">Clear Form</button>
+        <button class="btn-secondary" id="undoBtnEntry" onclick="undoLastEntry()" style="display:none">↩ Undo Last Save</button>
+        <button class="btn-primary" onclick="saveEntry()">Save Entry →</button>
+      </div>
+    </div>
+
+    <!-- Latest entry preview -->
+    <div class="latest-preview" id="latestPreview" style="display:none">
+      <div class="latest-preview-header">
+        <span class="latest-preview-title">◈ Most Recent Entry</span>
+        <span id="latestTimestamp" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--stone)"></span>
+      </div>
+      <div class="latest-preview-body" id="latestPreviewBody"></div>
+    </div>
+
+  </div>
+
+  <!-- REPORT PANEL -->
+  <div class="panel" id="panelReport" style="display:none">
+    <div class="report-controls">
+      <div style="flex:1">
+        <h2 class="panel-title">Discoveries</h2>
+        <p class="panel-subtitle">All logged entries for this session</p>
+      </div>
+      <button class="btn-secondary" onclick="window.print()">⎙ Print Report</button>
+      <button class="btn-secondary" id="undoBtn" onclick="undoLastEntry()" style="display:none">↩ Undo</button>
+      <button class="btn-danger" onclick="clearAllEntries()">✕ Clear All</button>
+    </div>
+
+    <div id="reportContent">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-state-icon">⛏</div>
+        <div class="empty-state-text">No entries yet — start logging in the New Entry tab</div>
+      </div>
+    </div>
+    <p class="print-hint" id="printHint" style="display:none">Use ⎙ Print to save or export as PDF</p>
+  </div>
+
+</div>
+
+<!-- Firebase loader — dynamically loads SDKs and retries on slow connections -->
+<script>
+(function() {
+  var CDN = 'https://www.gstatic.com/firebasejs/10.12.0/';
+  var loaded = 0;
+  function onLoaded() {
+    loaded++;
+    if (loaded === 2) {
+      // Both SDKs ready — dispatch event so main script can init Firebase
+      document.dispatchEvent(new Event('firebase-ready'));
+    }
+  }
+  function loadScript(src) {
+    var s = document.createElement('script');
+    s.src = CDN + src;
+    s.onload = onLoaded;
+    s.onerror = function() {
+      // Retry once after 1s on failure (common on slow mobile)
+      setTimeout(function() {
+        var r = document.createElement('script');
+        r.src = CDN + src;
+        r.onload = onLoaded;
+        document.head.appendChild(r);
+      }, 1000);
+    };
+    document.head.appendChild(s);
+  }
+  loadScript('firebase-app-compat.js');
+  loadScript('firebase-database-compat.js');
+})();
+</script>
+
+<script>
+  // ── ALL STATE & FUNCTIONS (available immediately for onclick handlers) ───
+
+  // ── PASSPHRASE / WORKSPACE ────────────────────────────────
+  let wsRoot = null;
+  let db     = null;
+
+  function simpleHash(str) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = (h * 0x01000193) >>> 0;
+    }
+    return 'ws_' + h.toString(16).padStart(8, '0');
+  }
+
+  function r(path) {
+    return db.ref(wsRoot + '/' + path);
+  }
+
+  // ── FIREBASE INIT — deferred until SDKs are ready ────────
+  document.addEventListener('firebase-ready', function() {
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBbvfshqO3Q1NfGr-cF__EQ8mwM-5ktMnk",
+      authDomain:        "archeology-notes.firebaseapp.com",
+      databaseURL:       "https://archeology-notes-default-rtdb.firebaseio.com",
+      projectId:         "archeology-notes",
+      storageBucket:     "archeology-notes.firebasestorage.app",
+      messagingSenderId: "1098980568764",
+      appId:             "1:1098980568764:web:3b6956803f3ad75e8a6ab9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    initDefaults();
+    ensureUser();
+  });
+
+  // ── LOCAL STATE ───────────────────────────────────────────
+  let entries      = [];
+  let notes        = [];
+  let projects     = [];
+  let sites        = [];
+  let undoStack    = [];
+  let findingRowCount = 0;
+  let currentUser  = localStorage.getItem('archUserName') || null;
+
+  // ── SYNC HELPERS ──────────────────────────────────────────
+  function setSyncStatus(state, label) {
+    const dot = document.getElementById('syncDot');
+    const lbl = document.getElementById('syncLabel');
+    dot.className = 'sync-dot ' + state;
+    lbl.textContent = label;
+  }
+
+  // ── USER NAME + PASSPHRASE ────────────────────────────────
+  function submitUserName() {
+    const nameVal = document.getElementById('userNameInput').value.trim();
+    const passVal = document.getElementById('userPassInput').value.trim();
+    const nameErr = document.getElementById('nameErr');
+    const passErr = document.getElementById('passErr');
+    nameErr.style.display = 'none';
+    passErr.style.display = 'none';
+
+    let ok = true;
+    if (!nameVal) { nameErr.style.display = 'block'; ok = false; }
+    if (!passVal) { passErr.style.display = 'block'; ok = false; }
+    if (!ok) return;
+
+    wsRoot = simpleHash(passVal);
+    currentUser = nameVal;
+    localStorage.setItem('archUserName', nameVal);
+    localStorage.setItem('archWsRoot', wsRoot);
+    document.getElementById('nameOverlay').style.display = 'none';
+    startFirebaseListeners();
+  }
+
+  function ensureUser() {
+    const savedWs = localStorage.getItem('archWsRoot');
+    if (currentUser && savedWs) {
+      wsRoot = savedWs;
+      startFirebaseListeners();
+    } else {
+      document.getElementById('nameOverlay').style.display = 'flex';
+      ['userNameInput','userPassInput'].forEach(id => {
+        document.getElementById(id).addEventListener('keydown', e => {
+          if (e.key === 'Enter') submitUserName();
+        });
+      });
+    }
+  }
+
+  // ── FIREBASE LISTENERS (real-time sync) ───────────────────
+  function startFirebaseListeners() {
+    setSyncStatus('saving', 'Connecting…');
+
+    // Entries
+    r('entries').on('value', snap => {
+      const val = snap.val();
+      entries = val ? Object.entries(val)
+        .map(([fbKey, e]) => ({ ...e, _fbKey: fbKey }))
+        .sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''))
+        : [];
+      localStorage.setItem('archEntries', JSON.stringify(entries));
+      updateBadge();
+      renderLatestPreview();
+      renderReport();
+      setSyncStatus('live', 'Live — ' + entries.length + ' entr' + (entries.length === 1 ? 'y' : 'ies'));
+    }, () => setSyncStatus('offline', 'Offline'));
+
+    // Notes
+    r('notes').on('value', snap => {
+      const val = snap.val();
+      notes = val ? Object.entries(val)
+        .map(([fbKey, n]) => ({ ...n, _fbKey: fbKey }))
+        .sort((a, b) => (b.ts || '').localeCompare(a.ts || ''))
+        : [];
+      localStorage.setItem('archNotes', JSON.stringify(notes));
+      renderNotes();
+    });
+
+    // Projects list
+    r('lists/projects').on('value', snap => {
+      projects = snap.val() || [];
+      localStorage.setItem('archProjects', JSON.stringify(projects));
+    });
+
+    // Sites list
+    r('lists/sites').on('value', snap => {
+      sites = snap.val() || [];
+      localStorage.setItem('archSites', JSON.stringify(sites));
+    });
+
+    // Bag number
+    r('lastBagNumber').on('value', snap => {
+      const remote = snap.val();
+      if (remote !== null) localStorage.setItem('archLastBag', String(remote));
+    });
+
+    // Connection state
+    db.ref('.info/connected').on('value', snap => {
+      if (!snap.val()) setSyncStatus('offline', 'Offline — changes will sync when reconnected');
+    });
+  }
+
+  // ── SAVED LISTS (projects & sites) ───────────────────────
+  function getSavedList(key) {
+    if (key === 'archProjects') return [...projects];
+    if (key === 'archSites')    return [...sites];
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  }
+  function saveList(key, arr) {
+    const unique = [...new Set(arr)];
+    if (key === 'archProjects') {
+      projects = unique;
+      r('lists/projects').set(unique);
+    } else if (key === 'archSites') {
+      sites = unique;
+      r('lists/sites').set(unique);
+    }
+    localStorage.setItem(key, JSON.stringify(unique));
+  }
+  function addToList(key, value) {
+    if (!value) return;
+    const list = getSavedList(key);
+    if (!list.includes(value)) { list.unshift(value); saveList(key, list); }
+  }
+  function removeFromList(key, value) {
+    const list = getSavedList(key).filter(v => v !== value);
+    saveList(key, list);
+  }
+
+  // ── COMBO DROPDOWN ────────────────────────────────────────
+  function buildComboDropdown(type) {
+    const key = type === 'project' ? 'archProjects' : 'archSites';
+    const inputId = type === 'project' ? 'projectName' : 'siteName';
+    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
+    const filter = document.getElementById(inputId).value.toLowerCase();
+    const items = getSavedList(key).filter(v => !filter || v.toLowerCase().includes(filter));
+    const drop = document.getElementById(dropId);
+
+    let html = items.map(v => `
+      <div class="combo-option" onmousedown="selectCombo(event,'${type}','${v.replace(/'/g,"\\'")}')">
+        <span class="combo-option-text">${v}</span>
+        <button class="combo-option-delete" onmousedown="deleteComboOption(event,'${type}','${v.replace(/'/g,"\\'")}')">✕</button>
+      </div>`).join('');
+    html += `<div class="combo-option new-entry" onmousedown="selectNewCombo(event,'${type}')">+ Enter new name…</div>`;
+    drop.innerHTML = html;
+  }
+
+  function openCombo(type) {
+    buildComboDropdown(type);
+    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
+    document.getElementById(dropId).classList.add('open');
+  }
+
+  function delayCloseCombo(type) {
+    setTimeout(() => {
+      const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
+      document.getElementById(dropId).classList.remove('open');
+    }, 200);
+  }
+
+  function toggleCombo(e, type) {
+    e.preventDefault();
+    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
+    const drop = document.getElementById(dropId);
+    if (drop.classList.contains('open')) {
+      drop.classList.remove('open');
+    } else {
+      buildComboDropdown(type);
+      drop.classList.add('open');
+      document.getElementById(type === 'project' ? 'projectName' : 'siteName').focus();
+    }
+  }
+
+  function filterCombo(type) {
+    buildComboDropdown(type);
+    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
+    document.getElementById(dropId).classList.add('open');
+  }
+
+  function selectCombo(e, type, value) {
+    e.preventDefault();
+    document.getElementById(type === 'project' ? 'projectName' : 'siteName').value = value;
+    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
+    document.getElementById(dropId).classList.remove('open');
+  }
+
+  function selectNewCombo(e, type) {
+    e.preventDefault();
+    const inputId = type === 'project' ? 'projectName' : 'siteName';
+    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
+    document.getElementById(inputId).value = '';
+    document.getElementById(inputId).placeholder = type === 'project' ? 'e.g. New project name' : 'e.g. New site name';
+    document.getElementById(dropId).classList.remove('open');
+    document.getElementById(inputId).focus();
+  }
+
+  function deleteComboOption(e, type, value) {
+    e.preventDefault();
+    e.stopPropagation();
+    const key = type === 'project' ? 'archProjects' : 'archSites';
+    removeFromList(key, value);
+    buildComboDropdown(type);
+  }
+
+  // ── HELPERS ──────────────────────────────────────────────
+  function getLastBagNumber() {
+    // Return the last entered bag number (most recent entry), not incremented
+    for (let i = entries.length - 1; i >= 0; i--) {
+      if (entries[i].bagNumber) return entries[i].bagNumber;
+    }
+    return '';
+  }
+
+  function getNextBagNumber() {
+    let maxBag = 0;
+    entries.forEach(e => {
+      const b = parseInt(e.bagNumber);
+      if (!isNaN(b) && b > maxBag) maxBag = b;
+    });
+    return maxBag > 0 ? String(maxBag + 1).padStart(3, '0') : '';
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const [y,m,day] = d.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${parseInt(day)} ${months[parseInt(m)-1]} ${y}`;
+  }
+
+  function formatTime(t) {
+    // Takes HH:MM (24h) and returns "14:30 (2:30 PM)"
+    if (!t) return '';
+    const [h, m] = t.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${t} (${h12}:${String(m).padStart(2,'0')} ${ampm})`;
+  }
+
+  function field(label, value) {
+    if (!value) return '';
+    return `<div class="entry-field"><div class="entry-field-label">${label}</div><div class="entry-field-value">${value}</div></div>`;
+  }
+
+  function fieldFull(label, value) {
+    if (!value) return '';
+    return `<div class="entry-field full"><div class="entry-field-label">${label}</div><div class="entry-field-value">${value}</div></div>`;
+  }
+
+  // ── FINDING ROWS ─────────────────────────────────────────
+  function makeFindingTypeOptions(selected) {
+    const types = ['Ceramics / Pottery','Lithics / Flint','Bone / Faunal','Metal Object','Architectural Feature','Organic Material','Human Remains','Soil Sample','No significant finds','Other'];
+    return '<option value="">Select type...</option>' + types.map(t => `<option${t === selected ? ' selected' : ''}>${t}</option>`).join('');
+  }
+
+  function addFindingRow(data) {
+    findingRowCount++;
+    const id = findingRowCount;
+    const list = document.getElementById('findingsList');
+    const count = list.children.length + 1;
+    const row = document.createElement('div');
+    row.className = 'finding-row';
+    row.dataset.id = id;
+    row.innerHTML = `
+      <span class="finding-row-num">Finding ${count}</span>
+      <div class="form-group">
+        <label>Find Type</label>
+        <select class="find-type-select">${makeFindingTypeOptions(data ? data.type : '')}</select>
+      </div>
+      <div class="form-group">
+        <label>Quantity / Ref. No.</label>
+        <input type="text" class="find-count-input" placeholder="e.g. 12 fragments" value="${data ? data.count : ''}">
+      </div>
+      <button class="btn-remove-finding" onclick="removeFindingRow(this)" title="Remove this finding">×</button>
+    `;
+    list.appendChild(row);
+    renumberFindings();
+  }
+
+  function removeFindingRow(btn) {
+    const row = btn.closest('.finding-row');
+    row.style.opacity = '0';
+    row.style.transform = 'translateY(-4px)';
+    row.style.transition = 'all 0.15s ease';
+    setTimeout(() => { row.remove(); renumberFindings(); }, 150);
+  }
+
+  function renumberFindings() {
+    document.querySelectorAll('#findingsList .finding-row').forEach((row, i) => {
+      row.querySelector('.finding-row-num').textContent = `Finding ${i + 1}`;
+    });
+  }
+
+  function collectFindings() {
+    const rows = document.querySelectorAll('#findingsList .finding-row');
+    const findings = [];
+    rows.forEach(row => {
+      const type = row.querySelector('.find-type-select').value;
+      const count = row.querySelector('.find-count-input').value.trim();
+      if (type || count) findings.push({ type, count });
+    });
+    return findings;
+  }
+
+  // ── INIT ─────────────────────────────────────────────────
+  function initDefaults() {
+    const now = new Date();
+    document.getElementById('entryDate').value = now.toISOString().split('T')[0];
+    document.getElementById('entryTime').value = now.toTimeString().slice(0,5);
+    document.getElementById('headerDate').textContent = now.toLocaleDateString('en-GB', {weekday:'long', year:'numeric', month:'long', day:'numeric'}).toUpperCase();
+
+    // Set the Chrono Notes field log header date
+    const notesDateStr = now.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+    document.getElementById('notesDisplayTitle').textContent = `◈ ${notesDateStr} — Field Log`;
+
+    // Pre-fill from last entry
+    if (entries.length > 0) {
+      const last = entries[entries.length - 1];
+      if (last.projectName) document.getElementById('projectName').value = last.projectName;
+      if (last.siteName)    document.getElementById('siteName').value    = last.siteName;
+
+      // Grid ref only if last entry was within 30 minutes
+      if (last.gridRef && last.timestamp) {
+        const minsAgo = (now - new Date(last.timestamp)) / 60000;
+        if (minsAgo <= 30) document.getElementById('gridRef').value = last.gridRef;
+      }
+    }
+
+    // Bag number: show last entered number as placeholder, auto-fill next
+    const lastBag = getLastBagNumber();
+    const nextBag = getNextBagNumber();
+    const bagInput = document.getElementById('bagNumber');
+    bagInput.placeholder = lastBag ? lastBag : '—';
+    if (nextBag) {
+      bagInput.value = nextBag;
+      document.getElementById('bagAutoLabel').style.display = 'inline';
+    }
+
+    addFindingRow();
+    updateBadge();
+    updateUndoBtn();
+    renderLatestPreview();
+    renderReport();
+    renderNotes();
+    document.getElementById('noteInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); logNote(); }
+    });
+  }
+
+  // ── TAB SWITCHING ─────────────────────────────────────────
+  function switchTab(tab) {
+    ['notes','entry','report'].forEach(t => {
+      const pid = 'panel' + t[0].toUpperCase() + t.slice(1);
+      const tid = 'tab'   + t[0].toUpperCase() + t.slice(1);
+      document.getElementById(pid).style.display = t === tab ? 'block' : 'none';
+      document.getElementById(tid).className = 'tab-btn ' + (t === tab ? 'active' : 'inactive');
+    });
+    if (tab === 'report') renderReport();
+  }
+
+  function updateBadge() {
+    document.getElementById('entryBadge').textContent = entries.length;
+  }
+
+  // ── CHRONOLOGICAL NOTES ───────────────────────────────────
+  function logNote() {
+    const ta = document.getElementById('noteInput');
+    const text = ta.value.trim();
+    if (!text) return;
+    setSyncStatus('saving', 'Saving…');
+    const note = {
+      id: Date.now(),
+      text,
+      ts: new Date().toISOString(),
+      author: currentUser || 'Unknown'
+    };
+    r('notes').push(note);
+    ta.value = '';
+    // renderNotes() will be called by the Firebase listener
+  }
+
+  function deleteNote(id) {
+    const note = notes.find(n => n.id === id);
+    if (!note || !note._fbKey) return;
+    setSyncStatus('saving', 'Saving…');
+    r('notes/' + note._fbKey).remove();
+  }
+
+  function fmtNoteTs(iso) {
+    const d = new Date(iso);
+    const H = d.getHours(), M = d.getMinutes();
+    const ampm = H >= 12 ? 'PM' : 'AM';
+    const h12  = H % 12 || 12;
+    const mins = String(M).padStart(2,'0');
+    return {
+      display: `At ${h12}:${mins} ${ampm}:`,
+      mil:     String(H).padStart(2,'0') + ':' + mins,
+      reg:     `${h12}:${mins} ${ampm}`,
+      date:    d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}).toUpperCase()
+    };
+  }
+
+  function renderNotes() {
+    const body = document.getElementById('notesBody');
+    if (notes.length === 0) {
+      body.innerHTML = '<div class="notes-empty">No notes yet — start logging above</div>';
+      return;
+    }
+    body.innerHTML = notes.map(n => {
+      const t = fmtNoteTs(n.ts);
+      const safe = n.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `<div class="note-entry" id="note-${n.id}">
+        <div class="note-ts">
+          <span class="note-ts-main">${t.display}</span>
+          <span class="note-ts-sub">${t.mil}</span>
+          <span class="note-ts-date">${t.date}</span>
+        </div>
+        <div class="note-body" id="note-body-${n.id}">${safe}</div>
+        <div class="note-actions">
+          <button class="note-action-btn" onclick="editNote(${n.id})">Edit</button>
+          <button class="note-action-btn del" onclick="deleteNote(${n.id})">Delete</button>
+        </div>
+      </div>
+      <div class="note-edit-area" id="note-edit-${n.id}">
+        <textarea class="note-edit-textarea" id="note-edit-ta-${n.id}">${safe}</textarea>
+        <div class="note-edit-btns">
+          <button class="note-save-btn" onclick="saveNoteEdit(${n.id})">Save</button>
+          <button class="note-cancel-btn" onclick="cancelNoteEdit(${n.id})">Cancel</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function editNote(id) {
+    document.getElementById('note-edit-' + id).classList.add('open');
+    const ta = document.getElementById('note-edit-ta-' + id);
+    // Decode HTML entities back to plain text for editing
+    ta.value = notes.find(n => n.id === id).text;
+    ta.focus();
+  }
+
+  function cancelNoteEdit(id) {
+    document.getElementById('note-edit-' + id).classList.remove('open');
+  }
+
+  function saveNoteEdit(id) {
+    const ta = document.getElementById('note-edit-ta-' + id);
+    const newText = ta.value.trim();
+    if (!newText) return;
+    const note = notes.find(n => n.id === id);
+    if (!note || !note._fbKey) return;
+    setSyncStatus('saving', 'Saving…');
+    r('notes/' + note._fbKey).update({ text: newText });
+    cancelNoteEdit(id);
+  }
+
+  function copyNotes() {
+    if (!notes.length) return;
+    const text = [...notes].reverse().map(n => {
+      const t = fmtNoteTs(n.ts);
+      return `${t.display}  [${t.mil} / ${t.date}]\n${n.text}`;
+    }).join('\n\n─────────────────────\n\n');
+
+    // Robust copy: try clipboard API first, fall back to textarea trick
+    function confirmCopy() {
+      const btn = document.getElementById('copyNotesBtn');
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '⎘ Copy All'; btn.classList.remove('copied'); }, 2000);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(confirmCopy).catch(() => fallbackCopy(text, confirmCopy));
+    } else {
+      fallbackCopy(text, confirmCopy);
+    }
+  }
+
+  function fallbackCopy(text, onSuccess) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      onSuccess();
+    } catch(e) {
+      alert('Copy failed. Please select the notes manually.');
+    }
+    document.body.removeChild(ta);
+  }
+
+  function printNotes() {
+    const win = window.open('','_blank','width=800,height=900');
+    const dateStr = new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    const safe = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const rows = [...notes].reverse().map(n => {
+      const t = fmtNoteTs(n.ts);
+      return `<tr><td class="ts">${t.display}<br><span class="sub">${t.mil}</span><br><span class="dt">${t.date}</span></td><td class="txt">${safe(n.text).replace(/\n/g,'<br>')}</td></tr>`;
+    }).join('');
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Chrono Notes — ArchæoLog</title>
+    <style>body{font-family:Georgia,serif;margin:40px;color:#2a1f14}h1{font-size:21px;margin-bottom:3px}.meta{font-family:monospace;font-size:11px;color:#9a8c7a;margin-bottom:22px}table{width:100%;border-collapse:collapse}td{vertical-align:top;padding:9px 13px;border:1px solid #d4c5a9}.ts{width:115px;background:#f5edd8;font-family:monospace;font-size:12px;white-space:nowrap}.sub{font-size:10px;color:#9a8c7a}.dt{font-size:9px;color:#9a8c7a;text-transform:uppercase;letter-spacing:.1em}.txt{font-size:13px;line-height:1.65;white-space:pre-wrap}@media print{body{margin:20px}}</style>
+    </head><body><h1>ArchæoLog — Chronological Notes</h1><div class="meta">Printed ${dateStr} · ${notes.length} note${notes.length!==1?'s':''}</div><table>${rows}</table><script>window.onload=()=>{window.print()}<\/script></body></html>`);
+    win.document.close();
+  }
+
+  // ── VALIDATION ────────────────────────────────────────────
+  function showRequiredHint(id) {
+    document.getElementById(id).classList.add('show');
+    setTimeout(() => document.getElementById(id).classList.remove('show'), 3000);
+  }
+
+  // ── SAVE ─────────────────────────────────────────────────
+  function saveEntry() {
+    const findings = collectFindings();
+    const projectVal = document.getElementById('projectName').value.trim();
+    const siteVal = document.getElementById('siteName').value.trim();
+    const bagVal = document.getElementById('bagNumber').value.trim();
+
+    let valid = true;
+    if (!projectVal) { showRequiredHint('projectRequiredHint'); valid = false; }
+    if (!siteVal) { showRequiredHint('siteRequiredHint'); valid = false; }
+    if (!bagVal) { showRequiredHint('bagRequiredHint'); valid = false; }
+    if (!valid) return;
+
+    if (!document.getElementById('observations').value.trim() && findings.length === 0) {
+      alert('Please add at least some observations or a finding before saving.');
+      return;
+    }
+
+    const entry = {
+      id: 'FIND-' + String(entries.length + 1).padStart(3, '0'),
+      timestamp: new Date().toISOString(),
+      projectName: projectVal,
+      siteName: siteVal,
+      gridRef: document.getElementById('gridRef').value.trim(),
+      date: document.getElementById('entryDate').value,
+      time: document.getElementById('entryTime').value,
+      depth: document.getElementById('depth').value.trim(),
+      bagNumber: bagVal,
+      recorder: document.getElementById('recorder').value.trim() || currentUser || '',
+      findings: findings || [],
+      observations: document.getElementById('observations').value.trim(),
+      author: currentUser || 'Unknown'
+    };
+
+    // Save to dropdown lists
+    addToList('archProjects', projectVal);
+    addToList('archSites', siteVal);
+
+    // Snapshot for undo
+    undoStack.push(JSON.stringify(entries));
+    updateUndoBtn();
+
+    // Push to Firebase — listener will update local entries array
+    setSyncStatus('saving', 'Saving…');
+    r('entries').push(entry);
+
+    // Sync bag number so all devices advance together
+    const bagNum = parseInt(bagVal);
+    if (!isNaN(bagNum)) r('lastBagNumber').transaction(cur => Math.max(cur || 0, bagNum));
+
+    const toast = document.getElementById('successToast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+
+    document.getElementById('entryTime').value = new Date().toTimeString().slice(0,5);
+    document.getElementById('observations').value = '';
+    document.getElementById('findingsList').innerHTML = '';
+    findingRowCount = 0;
+    addFindingRow();
+
+    // Advance bag number display
+    const nextBag = getNextBagNumber();
+    const bagInput = document.getElementById('bagNumber');
+    bagInput.placeholder = bagVal;
+    bagInput.value = nextBag;
+    document.getElementById('bagAutoLabel').style.display = nextBag ? 'inline' : 'none';
+  }
+
+  // ── CLEAR FORM ───────────────────────────────────────────
+  function clearForm() {
+    // Clear all text fields
+    ['gridRef','depth','recorder','observations'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+
+    // Restore project and site from last entry (they're sticky defaults)
+    const projectEl = document.getElementById('projectName');
+    const siteEl    = document.getElementById('siteName');
+    projectEl.value = '';
+    siteEl.value    = '';
+    if (entries.length > 0) {
+      const last = entries[entries.length - 1];
+      if (last.projectName) projectEl.value = last.projectName;
+      if (last.siteName)    siteEl.value    = last.siteName;
+    }
+
+    // Reset bag
+    document.getElementById('bagAutoLabel').style.display = 'none';
+    const lastBag = getLastBagNumber();
+    const nextBag = getNextBagNumber();
+    const bagInput = document.getElementById('bagNumber');
+    bagInput.placeholder = lastBag || '—';
+    bagInput.value = nextBag || '';
+    if (nextBag) document.getElementById('bagAutoLabel').style.display = 'inline';
+
+    // Reset date/time
+    const now = new Date();
+    document.getElementById('entryDate').value = now.toISOString().split('T')[0];
+    document.getElementById('entryTime').value = now.toTimeString().slice(0,5);
+
+    // Clear ALL findings and add one fresh row
+    document.getElementById('findingsList').innerHTML = '';
+    findingRowCount = 0;
+    addFindingRow();
+  }
+
+  // ── RENDER LATEST PREVIEW ────────────────────────────────
+  function renderLatestPreview() {
+    const preview = document.getElementById('latestPreview');
+    if (entries.length === 0) { preview.style.display = 'none'; return; }
+    const e = entries[entries.length - 1];
+    preview.style.display = 'block';
+    document.getElementById('latestTimestamp').textContent = e.id + (e.bagNumber ? ' · Bag #' + e.bagNumber : '') + (e.projectName ? ' · ' + e.projectName : '') + ' · ' + formatDate(e.date);
+    document.getElementById('latestPreviewBody').innerHTML = buildEntryCardBody(e);
+  }
+
+  // ── BUILD ENTRY CARD ─────────────────────────────────────
+  function buildFindingsTable(findings) {
+    if (!findings || findings.length === 0) return '';
+    const rows = findings.map((f, i) =>
+      `<tr>
+        <td class="finding-num-cell">Finding ${i+1}</td>
+        <td>${f.type || '—'}</td>
+        <td>${f.count || '—'}</td>
+      </tr>`
+    ).join('');
+    return `<div class="entry-field full">
+      <div class="entry-field-label">Findings (${findings.length})</div>
+      <table class="findings-report-table">
+        <thead><tr>
+          <th style="width:60px">#</th>
+          <th>Type</th>
+          <th>Quantity / Ref.</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
+
+  function buildEntryCardBody(e) {
+    return `<div class="entry-card-body">
+      ${buildFindingsTable(e.findings)}
+      <div class="entry-field field-highlight-project">${e.projectName ? `<div class="entry-field-label">Project</div><div class="entry-field-value">${e.projectName}</div>` : ''}</div>
+      ${field('Site', e.siteName)}
+      ${field('Grid / Trench', e.gridRef)}
+      ${field('Date', formatDate(e.date))}
+      ${field('Time', formatTime(e.time))}
+      ${field('Depth / Layer', e.depth)}
+      <div class="entry-field field-highlight-bag">${e.bagNumber ? `<div class="entry-field-label">Bag Number</div><div class="entry-field-value">#${e.bagNumber}</div>` : ''}</div>
+      ${field('Recorded By', e.recorder)}
+      ${fieldFull('Observations', e.observations)}
+    </div>`;
+  }
+
+  // ── RENDER REPORT ─────────────────────────────────────────
+  function renderReport() {
+    const container = document.getElementById('reportContent');
+    const hint = document.getElementById('printHint');
+
+    if (entries.length === 0) {
+      container.innerHTML = `<div class="empty-state">
+        <div class="empty-state-icon">⛏</div>
+        <div class="empty-state-text">No entries yet — start logging in the New Entry tab</div>
+      </div>`;
+      hint.style.display = 'none';
+      return;
+    }
+
+    hint.style.display = 'block';
+
+    const sites = [...new Set(entries.map(e => e.siteName).filter(Boolean))];
+    const projects = [...new Set(entries.map(e => e.projectName).filter(Boolean))];
+    const finders = [...new Set(entries.map(e => e.recorder).filter(Boolean))];
+    const totalFindings = entries.reduce((sum, e) => sum + (e.findings ? e.findings.filter(f => f.type && f.type !== 'No significant finds').length : 0), 0);
+    const reportDate = entries[0].date ? formatDate(entries[0].date) : new Date().toLocaleDateString();
+    const projectLabel = projects.length > 0 ? projects.join(', ') : 'Field Report';
+
+    let html = `<div class="report-document">
+      <div class="report-header">
+        <div class="report-header-title">Archaeological Findings</div>
+        <div class="report-header-meta">${projectLabel} &nbsp;·&nbsp; ${reportDate} &nbsp;·&nbsp; ${entries.length} Log ${entries.length === 1 ? 'Entry' : 'Entries'}</div>
+      </div>
+      <div class="report-body">
+        <div class="report-summary-grid" style="grid-template-columns:repeat(5,1fr)">
+          <div class="summary-stat"><div class="summary-stat-num">${entries.length}</div><div class="summary-stat-label">Log Entries</div></div>
+          <div class="summary-stat"><div class="summary-stat-num">${projects.length || '—'}</div><div class="summary-stat-label">Projects</div></div>
+          <div class="summary-stat"><div class="summary-stat-num">${sites.length || '—'}</div><div class="summary-stat-label">Sites</div></div>
+          <div class="summary-stat"><div class="summary-stat-num">${totalFindings}</div><div class="summary-stat-label">Total Finds</div></div>
+          <div class="summary-stat"><div class="summary-stat-num">${finders.length || '—'}</div><div class="summary-stat-label">Log Recorders</div></div>
+        </div>`;
+
+    entries.forEach((e, i) => {
+      const cardTitle = e.projectName
+        ? `<strong style="font-size:13px;font-family:'Playfair Display',serif;color:var(--earth-dark)">${e.projectName}</strong>`
+        : `<span style="color:var(--stone);font-size:11px">No Project</span>`;
+      const bagLabel = e.bagNumber
+        ? `<strong style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--sienna)">Bag #${e.bagNumber}</strong>`
+        : '';
+      html += `<div class="entry-card">
+        <div class="entry-card-header">
+          <span class="entry-card-id">${cardTitle}${bagLabel ? ' &nbsp;·&nbsp; ' + bagLabel : ''}</span>
+          <span class="entry-card-time">${formatDate(e.date)}${e.time ? ' · ' + formatTime(e.time) : ''}</span>
+          <button class="btn-danger" onclick="deleteEntry(${i})">Remove</button>
+        </div>
+        ${buildEntryCardBody(e)}
+      </div>`;
+    });
+
+    html += '</div></div>';
+    container.innerHTML = html;
+  }
+
+  // ── DELETE / CLEAR ────────────────────────────────────────
+  function deleteEntry(i) {
+    if (!confirm('Remove this entry from the report?')) return;
+    const entry = entries[i];
+    if (!entry) return;
+    undoStack.push(JSON.stringify(entries));
+    updateUndoBtn();
+    if (entry._fbKey) {
+      setSyncStatus('saving', 'Saving…');
+      r('entries/' + entry._fbKey).remove();
+      // listener will update local entries + re-render
+    }
+  }
+
+  function clearAllEntries() {
+    if (!confirm('Delete ALL entries from Discoveries? Press Undo to recover them.')) return;
+    undoStack.push(JSON.stringify(entries));
+    updateUndoBtn();
+    setSyncStatus('saving', 'Saving…');
+    r('entries').remove();
+    // listener will update local entries + re-render
+  }
+
+  function undoLastEntry() {
+    if (undoStack.length === 0) return;
+    const snapshot = JSON.parse(undoStack.pop());
+    updateUndoBtn();
+    setSyncStatus('saving', 'Restoring…');
+    // Wipe current entries in Firebase then re-write the snapshot
+    r('entries').remove().then(() => {
+      const writes = {};
+      snapshot.forEach(e => {
+        const key = e._fbKey || r('entries').push().key;
+        const { _fbKey, ...clean } = e;
+        writes[key] = clean;
+      });
+      if (Object.keys(writes).length > 0) r('entries').update(writes);
+      // listener will re-populate entries array + re-render
+    });
+  }
+
+  function updateUndoBtn() {
+    const show = undoStack.length > 0;
+    ['undoBtn', 'undoBtnEntry'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.style.display = show ? 'inline-block' : 'none';
+    });
+  }
+
+  // ── STICKY TAB SHADOW ────────────────────────────────────
+  // Adds a shadow to the tab row when it's stuck at the top
+  const tabNav = document.querySelector('.tab-nav');
+  const sentinel = document.createElement('div');
+  sentinel.style.cssText = 'height:1px;margin-top:-1px;pointer-events:none';
+  tabNav.parentElement.insertBefore(sentinel, tabNav);
+  new IntersectionObserver(([e]) => {
+    tabNav.classList.toggle('is-sticky', e.intersectionRatio < 1);
+  }, { threshold: [1] }).observe(sentinel);
+
+</script>
+</body>
+</html>
