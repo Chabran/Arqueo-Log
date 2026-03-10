@@ -449,7 +449,7 @@
 
   .finding-row {
     display: grid;
-    grid-template-columns: 1fr 1fr auto;
+    grid-template-columns: 1fr 1fr 1fr auto;
     gap: 10px;
     align-items: end;
     padding: 12px 14px;
@@ -1345,6 +1345,7 @@
         <div class="notes-display-actions">
           <button class="btn-notes-action" id="copyNotesBtn" onclick="copyNotes()">⎘ Copy All</button>
           <button class="btn-notes-action" onclick="printNotes()">⎙ Print PDF</button>
+          <button class="btn-notes-action" onclick="exportNotesCSV()">⬇ CSV</button>
         </div>
       </div>
       <div class="notes-display-body" id="notesBody">
@@ -1452,11 +1453,6 @@
     <div class="findings-list" id="findingsList"></div>
     <button class="btn-add-finding" onclick="addFindingRow()">+ Add Finding</button>
 
-    <div class="form-group" style="margin-bottom:16px">
-      <label for="observations">Field Observations</label>
-      <textarea id="observations" placeholder="e.g. Encountered dense ceramic scatter at 35 cm, possible midden deposit. Several sherds show red-slip decoration consistent with earlier layers. Soil transitions from sandy loam to compacted clay."></textarea>
-    </div>
-
     <!-- NEXT STEPS TEMPLATE — reserved for future tab (v1.3+)
     <div class="form-group">
       <label for="nextSteps">Recommended Next Steps</label>
@@ -1492,6 +1488,7 @@
         <p class="panel-subtitle">All logged entries for this session</p>
       </div>
       <button class="btn-secondary" onclick="window.print()">⎙ Print Report</button>
+      <button class="btn-secondary" onclick="exportEntriesCSV()">⬇ Export CSV</button>
       <button class="btn-secondary" id="undoBtn" onclick="undoLastEntry()" style="display:none">↩ Undo</button>
       <button class="btn-danger" onclick="clearAllEntries()">✕ Clear All</button>
     </div>
@@ -1853,6 +1850,10 @@
         <label>Quantity / Ref. No.</label>
         <input type="text" class="find-count-input" placeholder="e.g. 12 fragments" value="${data ? data.count : ''}">
       </div>
+      <div class="form-group">
+        <label>Description <span style="color:var(--stone);font-weight:400">(optional)</span></label>
+        <input type="text" class="find-desc-input" placeholder="e.g. Red-slip decoration, worn edges" value="${data ? (data.desc || '') : ''}">
+      </div>
       <button class="btn-remove-finding" onclick="removeFindingRow(this)" title="Remove this finding">×</button>
     `;
     list.appendChild(row);
@@ -1877,9 +1878,10 @@
     const rows = document.querySelectorAll('#findingsList .finding-row');
     const findings = [];
     rows.forEach(row => {
-      const type = row.querySelector('.find-type-select').value;
+      const type  = row.querySelector('.find-type-select').value;
       const count = row.querySelector('.find-count-input').value.trim();
-      if (type || count) findings.push({ type, count });
+      const desc  = row.querySelector('.find-desc-input').value.trim();
+      if (type || count) findings.push({ type, count, desc });
     });
     return findings;
   }
@@ -2102,6 +2104,61 @@
     win.document.close();
   }
 
+  // ── CSV HELPERS ───────────────────────────────────────────
+  function csvCell(val) {
+    const s = (val === null || val === undefined) ? '' : String(val);
+    // Wrap in quotes if contains comma, quote, or newline
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+  function csvRow(cells) { return cells.map(csvCell).join(','); }
+  function downloadCSV(filename, rows) {
+    const blob = new Blob([rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function exportEntriesCSV() {
+    if (!entries.length) return;
+    // Find max findings count across all entries
+    const maxF = Math.max(...entries.map(e => (e.findings || []).length), 1);
+    // Build header
+    const findingCols = [];
+    for (let i = 1; i <= maxF; i++) {
+      findingCols.push(`Finding ${i} Type`, `Finding ${i} Qty`, `Finding ${i} Description`);
+    }
+    const header = csvRow(['Date','Time','Project','Site','Grid / Trench','Depth / Layer','Bag Number','Recorded By', ...findingCols]);
+    const rows = entries.map(e => {
+      const findingCells = [];
+      for (let i = 0; i < maxF; i++) {
+        const f = (e.findings || [])[i];
+        findingCells.push(f ? f.type : '', f ? f.count : '', f ? (f.desc || '') : '');
+      }
+      return csvRow([
+        e.date || '', formatTime(e.time) || '', e.projectName || '', e.siteName || '',
+        e.gridRef || '', e.depth || '', e.bagNumber || '', e.recorder || '',
+        ...findingCells
+      ]);
+    });
+    const date = new Date().toISOString().split('T')[0];
+    downloadCSV(`arqueolog-discoveries-${date}.csv`, [header, ...rows]);
+  }
+
+  function exportNotesCSV() {
+    if (!notes.length) return;
+    const header = csvRow(['Date','Time','Author','Note']);
+    const rows = [...notes].reverse().map(n => {
+      const t = fmtNoteTs(n.ts);
+      return csvRow([t.date, t.reg, n.author || '', n.text || '']);
+    });
+    const date = new Date().toISOString().split('T')[0];
+    downloadCSV(`arqueolog-notes-${date}.csv`, [header, ...rows]);
+  }
+
   // ── VALIDATION ────────────────────────────────────────────
   function showRequiredHint(id) {
     document.getElementById(id).classList.add('show');
@@ -2121,8 +2178,8 @@
     if (!bagVal) { showRequiredHint('bagRequiredHint'); valid = false; }
     if (!valid) return;
 
-    if (!document.getElementById('observations').value.trim() && findings.length === 0) {
-      alert('Please add at least some observations or a finding before saving.');
+    if (findings.length === 0) {
+      alert('Please add at least one finding before saving.');
       return;
     }
 
@@ -2138,7 +2195,6 @@
       bagNumber: bagVal,
       recorder: document.getElementById('recorder').value.trim() || currentUser || '',
       findings: findings || [],
-      observations: document.getElementById('observations').value.trim(),
       author: currentUser || 'Unknown'
     };
 
@@ -2163,7 +2219,6 @@
     setTimeout(() => toast.classList.remove('show'), 2800);
 
     document.getElementById('entryTime').value = new Date().toTimeString().slice(0,5);
-    document.getElementById('observations').value = '';
     document.getElementById('findingsList').innerHTML = '';
     findingRowCount = 0;
     addFindingRow();
@@ -2179,7 +2234,7 @@
   // ── CLEAR FORM ───────────────────────────────────────────
   function clearForm() {
     // Clear all text fields
-    ['gridRef','depth','recorder','observations'].forEach(id => {
+    ['gridRef','depth','recorder'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -2237,6 +2292,7 @@
         <td class="finding-num-cell">Finding ${i+1}</td>
         <td>${f.type || '—'}</td>
         <td>${f.count || '—'}</td>
+        <td>${f.desc || '—'}</td>
       </tr>`
     ).join('');
     return `<div class="entry-field full">
@@ -2246,6 +2302,7 @@
           <th style="width:60px">#</th>
           <th>Type</th>
           <th>Quantity / Ref.</th>
+          <th>Description</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
@@ -2263,7 +2320,6 @@
       ${field('Depth / Layer', e.depth)}
       <div class="entry-field field-highlight-bag">${e.bagNumber ? `<div class="entry-field-label">Bag Number</div><div class="entry-field-value">#${e.bagNumber}</div>` : ''}</div>
       ${field('Recorded By', e.recorder)}
-      ${fieldFull('Observations', e.observations)}
     </div>`;
   }
 
