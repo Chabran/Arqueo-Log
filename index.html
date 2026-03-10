@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Field Report — Archaeology Assistant</title>
+<title>Field Report — ArqueoLog</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1287,7 +1287,7 @@
 
   <header class="site-header">
     <div class="header-eyebrow">Field Documentation System</div>
-    <h1 class="site-title">Arch<span>æ</span>o Log</h1>
+    <h1 class="site-title">Arque<span>o</span> Log</h1>
     <div class="header-meta" id="headerDate">—</div>
   </header>
 
@@ -1300,7 +1300,7 @@
   <!-- NAME PROMPT OVERLAY -->
   <div class="name-overlay" id="nameOverlay" style="display:none">
     <div class="name-card">
-      <h2>Welcome to ArchæoLog</h2>
+      <h2>Welcome to ArqueoLog</h2>
       <p>Enter your name and the team passphrase to join your colleagues' shared workspace.</p>
       <input type="text" id="userNameInput" placeholder="Your name  e.g. J. Rivera" maxlength="40" autocomplete="name">
       <span class="overlay-err" id="nameErr" style="display:none">⚑ Please enter your name</span>
@@ -2075,9 +2075,9 @@
       const t = fmtNoteTs(n.ts);
       return `<tr><td class="ts">${t.display}<br><span class="sub">${t.mil}</span><br><span class="dt">${t.date}</span></td><td class="txt">${safe(n.text).replace(/\n/g,'<br>')}</td></tr>`;
     }).join('');
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Chrono Notes — ArchæoLog</title>
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Chrono Notes — ArqueoLog</title>
     <style>body{font-family:Georgia,serif;margin:40px;color:#2a1f14}h1{font-size:21px;margin-bottom:3px}.meta{font-family:monospace;font-size:11px;color:#9a8c7a;margin-bottom:22px}table{width:100%;border-collapse:collapse}td{vertical-align:top;padding:9px 13px;border:1px solid #d4c5a9}.ts{width:115px;background:#f5edd8;font-family:monospace;font-size:12px;white-space:nowrap}.sub{font-size:10px;color:#9a8c7a}.dt{font-size:9px;color:#9a8c7a;text-transform:uppercase;letter-spacing:.1em}.txt{font-size:13px;line-height:1.65;white-space:pre-wrap}@media print{body{margin:20px}}</style>
-    </head><body><h1>ArchæoLog — Chronological Notes</h1><div class="meta">Printed ${dateStr} · ${notes.length} note${notes.length!==1?'s':''}</div><table>${rows}</table><script>window.onload=()=>{window.print()}<\/script></body></html>`);
+    </head><body><h1>ArqueoLog — Chronological Notes</h1><div class="meta">Printed ${dateStr} · ${notes.length} note${notes.length!==1?'s':''}</div><table>${rows}</table><script>window.onload=()=>{window.print()}<\/script></body></html>`);
     win.document.close();
   }
 
@@ -2267,7 +2267,7 @@
 
     let html = `<div class="report-document">
       <div class="report-header">
-        <div class="report-header-title">Archaeological Findings</div>
+        <div class="report-header-title">Arqueo Findings</div>
         <div class="report-header-meta">${projectLabel} &nbsp;·&nbsp; ${reportDate} &nbsp;·&nbsp; ${entries.length} Log ${entries.length === 1 ? 'Entry' : 'Entries'}</div>
       </div>
       <div class="report-body">
