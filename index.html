@@ -1841,7 +1841,7 @@
     row.className = 'finding-row';
     row.dataset.id = id;
     row.innerHTML = `
-      <span class="finding-row-num">Finding ${count}</span>
+      <span class="finding-row-num">Finding</span>
       <div class="form-group">
         <label>Find Type</label>
         <select class="find-type-select">${makeFindingTypeOptions(data ? data.type : '')}</select>
@@ -1870,7 +1870,7 @@
 
   function renumberFindings() {
     document.querySelectorAll('#findingsList .finding-row').forEach((row, i) => {
-      row.querySelector('.finding-row-num').textContent = `Finding ${i + 1}`;
+      row.querySelector('.finding-row-num').textContent = `Finding`;
     });
   }
 
@@ -2129,7 +2129,7 @@
     // Build header
     const findingCols = [];
     for (let i = 1; i <= maxF; i++) {
-      findingCols.push(`Finding ${i} Type`, `Finding ${i} Qty`, `Finding ${i} Description`);
+      findingCols.push(`Finding Type`, `Finding Qty`, `Finding Description`);
     }
     const header = csvRow(['Date','Time','Project','Site','Grid / Trench','Depth / Layer','Bag Number','Recorded By', ...findingCols]);
     const rows = entries.map(e => {
@@ -2289,7 +2289,7 @@
     if (!findings || findings.length === 0) return '';
     const rows = findings.map((f, i) =>
       `<tr>
-        <td class="finding-num-cell">Finding ${i+1}</td>
+        <td class="finding-num-cell">Finding</td>
         <td>${f.type || '—'}</td>
         <td>${f.count || '—'}</td>
         <td>${f.desc || '—'}</td>
