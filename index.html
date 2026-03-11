@@ -657,6 +657,77 @@
     max-width: 200px;
   }
 
+  /* ── ENTRY TYPE TOGGLE ───────────────────────────────────── */
+  .entry-type-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .entry-type-toggle {
+    display: inline-flex;
+    background: var(--sand);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 7px;
+    padding: 3px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .entry-type-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--stone);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+
+  .entry-type-btn.active {
+    background: var(--earth-dark);
+    color: var(--parchment);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+
+  .entry-type-btn:not(.active):hover { background: var(--sand-dark); color: var(--ink); }
+
+  .report-type-toggle { flex-shrink: 0; }
+
+  /* Type badge on entry cards */
+  .entry-type-badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    border: 1px solid;
+    margin-left: 8px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
+  .entry-type-badge.material {
+    color: var(--moss);
+    background: rgba(61,82,39,0.1);
+    border-color: rgba(61,82,39,0.3);
+  }
+
+  .entry-type-badge.element {
+    color: #4a6b8a;
+    background: rgba(74,107,138,0.1);
+    border-color: rgba(74,107,138,0.3);
+  }
+
   .report-document {
     border: 1.5px solid var(--sand-dark);
     border-radius: 6px;
@@ -828,6 +899,80 @@
   }
 
   /* ── CHRONOLOGICAL NOTES ───────────────────────────────── */
+
+  /* ── NOTES FILTER BAR ───────────────────────────────────── */
+  .notes-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .notes-filter-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notes-filter-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--stone);
+    white-space: nowrap;
+  }
+  .notes-filter-select {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 6px 10px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 5px;
+    background: var(--parchment);
+    color: var(--ink);
+    cursor: pointer;
+    outline: none;
+    min-width: 160px;
+  }
+  .notes-filter-select:focus { border-color: var(--sienna); }
+  .notes-search-input {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 5px;
+    background: var(--parchment);
+    color: var(--ink);
+    outline: none;
+    width: 190px;
+    transition: border-color 0.2s;
+  }
+  .notes-search-input:focus { border-color: var(--sienna); }
+  .notes-search-input::placeholder { color: var(--stone); font-style: italic; }
+  .notes-filter-clear {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sienna);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    display: none;
+  }
+  .notes-filter-bar.has-filter .notes-filter-clear { display: inline; }
+  .notes-filter-bar.has-filter .notes-filter-select,
+  .notes-filter-bar.has-filter .notes-search-input { border-color: var(--sienna); background: #fff8f4; }
+  .notes-empty-filter {
+    padding: 32px 20px;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--stone);
+    letter-spacing: 0.1em;
+  }
+
   .notes-input-row {
     display: flex;
     gap: 10px;
@@ -835,7 +980,64 @@
     margin-bottom: 24px;
   }
 
-  .notes-textarea {
+  .notes-input-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .note-project-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .note-project-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--stone);
+    white-space: nowrap;
+  }
+
+  .note-project-combo {
+    position: relative;
+    flex: 1;
+  }
+
+  .note-project-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 5px;
+    background: var(--parchment);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .note-project-input:focus { border-color: var(--sienna); }
+  .note-project-input::placeholder { color: var(--stone); font-style: italic; }
+
+  /* Project tag on rendered note entries */
+  .note-project-tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sienna);
+    background: rgba(196,98,45,0.1);
+    border: 1px solid rgba(196,98,45,0.25);
+    border-radius: 3px;
+    padding: 1px 6px;
+    margin-top: 4px;
+  }
     flex: 1;
     font-family: 'IBM Plex Sans', sans-serif;
     font-size: 14px;
@@ -1250,6 +1452,9 @@
     .finding-row-num { grid-column: 1; }
 
     /* Notes */
+    .notes-filter-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+    .notes-filter-left { flex-wrap: wrap; }
+    .notes-search-input { width: 100%; box-sizing: border-box; }
     .notes-input-row { flex-direction: column; gap: 8px; }
     .btn-log-note { width: 100%; text-align: center; }
     .note-ts { width: 110px; padding: 10px 10px; }
@@ -1339,8 +1544,35 @@
     <h2 class="panel-title">Chronological Notes</h2>
     <p class="panel-subtitle">Time-stamped field notes — logged as you work</p>
 
+    <!-- DATE FILTER BAR -->
+    <div class="notes-filter-bar" id="notesFilterBar">
+      <div class="notes-filter-left">
+        <span class="notes-filter-label">View</span>
+        <select class="notes-filter-select" id="notesDateFilter" onchange="applyNotesFilter()">
+          <option value="all">All Dates</option>
+        </select>
+        <select class="notes-filter-select" id="notesProjectFilter" onchange="applyNotesFilter()">
+          <option value="all">All Projects</option>
+        </select>
+        <button class="notes-filter-clear" id="notesFilterClear" onclick="clearNotesFilter()">✕ Clear</button>
+      </div>
+      <div class="notes-filter-right">
+        <input class="notes-search-input" id="notesSearch" type="text" placeholder="Search notes…" oninput="applyNotesFilter()">
+      </div>
+    </div>
+
     <div class="notes-input-row">
-      <textarea class="notes-textarea" id="noteInput" placeholder="Type a note — an observation, a decision, a reminder… Ctrl+Enter to save."></textarea>
+      <div class="notes-input-col">
+        <div class="note-project-row">
+          <label class="note-project-label" for="noteProject">Project</label>
+          <div class="note-project-combo" id="noteProjectCombo">
+            <input type="text" class="note-project-input" id="noteProject" placeholder="Select or type project…" autocomplete="off"
+              oninput="filterCombo('noteProject')" onfocus="openCombo('noteProject')" onblur="setTimeout(()=>closeCombo('noteProject'),180)">
+            <div class="combo-dropdown" id="noteProjectDropdown" style="display:none"></div>
+          </div>
+        </div>
+        <textarea class="notes-textarea" id="noteInput" placeholder="Type a note — an observation, a decision, a reminder… Ctrl+Enter to save."></textarea>
+      </div>
       <button class="btn-log-note" onclick="logNote()">Log Note ↵</button>
     </div>
 
@@ -1361,8 +1593,13 @@
 
   <!-- NEW ENTRY PANEL -->
   <div class="panel" id="panelEntry">
-    <h2 class="panel-title">Field Entry</h2>
-    <p class="panel-subtitle">Document your observations, finds, and site conditions</p>
+    <div class="entry-type-header">
+      <div class="entry-type-toggle" id="entryTypeToggle">
+        <button class="entry-type-btn active" id="typeBtnMaterial" onclick="setEntryType('material')">Material</button>
+        <button class="entry-type-btn" id="typeBtnElement" onclick="setEntryType('element')">Field Element</button>
+      </div>
+      <p class="panel-subtitle" id="entryTypeSubtitle">Recovered artefacts, samples &amp; physical finds</p>
+    </div>
 
     <div class="section-label">Location & Time</div>
     <div class="form-grid">
@@ -1400,13 +1637,18 @@
         <label for="depth">Depth / Layer (cm)</label>
         <input type="text" id="depth" placeholder="e.g. 30–45 cm / Layer IIa">
       </div>
-      <div class="form-group">
+      <div class="form-group" id="bagFieldGroup">
         <label for="bagNumber">Bag Number <span style="color:var(--sienna)">*</span></label>
         <div class="bag-number-wrapper">
           <input type="text" id="bagNumber" placeholder="—">
           <span class="bag-auto-label" id="bagAutoLabel" style="display:none">auto</span>
         </div>
         <span class="field-required-hint" id="bagRequiredHint">⚑ Bag number is required</span>
+      </div>
+      <div class="form-group" id="elementNameGroup" style="display:none">
+        <label for="elementName">Element Name <span style="color:var(--sienna)">*</span></label>
+        <input type="text" id="elementName" placeholder="e.g. Wall Foundation, Hearth, Pit">
+        <span class="field-required-hint" id="elementNameRequiredHint">⚑ Element name is required</span>
       </div>
       <div class="form-group">
         <label for="recorder">Recorded By</label>
@@ -1491,6 +1733,11 @@
       <div style="flex:1">
         <h2 class="panel-title">Discoveries</h2>
         <p class="panel-subtitle">All logged entries for this session</p>
+      </div>
+      <div class="entry-type-toggle report-type-toggle" id="reportTypeToggle">
+        <button class="entry-type-btn active" id="reportTypeBtnAll"      onclick="setReportFilter('all')">All</button>
+        <button class="entry-type-btn"        id="reportTypeBtnMaterial" onclick="setReportFilter('material')">Material</button>
+        <button class="entry-type-btn"        id="reportTypeBtnElement"  onclick="setReportFilter('element')">Field Element</button>
       </div>
       <button class="btn-secondary" onclick="window.print()">⎙ Print Report</button>
       <button class="btn-secondary" onclick="exportEntriesCSV()">⬇ Export CSV</button>
@@ -1586,6 +1833,8 @@
   let undoStack    = [];
   let findingRowCount = 0;
   let currentUser  = localStorage.getItem('archUserName') || null;
+  let currentEntryType    = 'material'; // 'material' | 'element'
+  let currentReportFilter = 'all';      // 'all' | 'material' | 'element'
 
   // ── SYNC HELPERS ──────────────────────────────────────────
   function setSyncStatus(state, label) {
@@ -1713,14 +1962,20 @@
   }
 
   // ── COMBO DROPDOWN ────────────────────────────────────────
-  function buildComboDropdown(type) {
-    const key = type === 'project' ? 'archProjects' : 'archSites';
-    const inputId = type === 'project' ? 'projectName' : 'siteName';
-    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
-    const filter = document.getElementById(inputId).value.toLowerCase();
-    const items = getSavedList(key).filter(v => !filter || v.toLowerCase().includes(filter));
-    const drop = document.getElementById(dropId);
+  function comboConfig(type) {
+    if (type === 'project')     return { key: 'archProjects', inputId: 'projectName',  dropId: 'projectDropdown' };
+    if (type === 'site')        return { key: 'archSites',    inputId: 'siteName',     dropId: 'siteDropdown' };
+    if (type === 'noteProject') return { key: 'archProjects', inputId: 'noteProject',  dropId: 'noteProjectDropdown' };
+    return null;
+  }
 
+  function buildComboDropdown(type) {
+    const cfg = comboConfig(type);
+    if (!cfg) return;
+    const filter = document.getElementById(cfg.inputId).value.toLowerCase();
+    const items = getSavedList(cfg.key).filter(v => !filter || v.toLowerCase().includes(filter));
+    const drop = document.getElementById(cfg.dropId);
+    if (!drop) return;
     let html = items.map(v => `
       <div class="combo-option" onmousedown="selectCombo(event,'${type}','${v.replace(/'/g,"\\'")}')">
         <span class="combo-option-text">${v}</span>
@@ -1732,58 +1987,55 @@
 
   function openCombo(type) {
     buildComboDropdown(type);
-    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
-    document.getElementById(dropId).classList.add('open');
+    document.getElementById(comboConfig(type).dropId).classList.add('open');
+  }
+
+  function closeCombo(type) {
+    const cfg = comboConfig(type);
+    if (cfg) document.getElementById(cfg.dropId).classList.remove('open');
   }
 
   function delayCloseCombo(type) {
-    setTimeout(() => {
-      const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
-      document.getElementById(dropId).classList.remove('open');
-    }, 200);
+    setTimeout(() => closeCombo(type), 200);
   }
 
   function toggleCombo(e, type) {
     e.preventDefault();
-    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
-    const drop = document.getElementById(dropId);
+    const cfg = comboConfig(type);
+    const drop = document.getElementById(cfg.dropId);
     if (drop.classList.contains('open')) {
       drop.classList.remove('open');
     } else {
       buildComboDropdown(type);
       drop.classList.add('open');
-      document.getElementById(type === 'project' ? 'projectName' : 'siteName').focus();
+      document.getElementById(cfg.inputId).focus();
     }
   }
 
   function filterCombo(type) {
     buildComboDropdown(type);
-    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
-    document.getElementById(dropId).classList.add('open');
+    document.getElementById(comboConfig(type).dropId).classList.add('open');
   }
 
   function selectCombo(e, type, value) {
     e.preventDefault();
-    document.getElementById(type === 'project' ? 'projectName' : 'siteName').value = value;
-    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
-    document.getElementById(dropId).classList.remove('open');
+    document.getElementById(comboConfig(type).inputId).value = value;
+    document.getElementById(comboConfig(type).dropId).classList.remove('open');
   }
 
   function selectNewCombo(e, type) {
     e.preventDefault();
-    const inputId = type === 'project' ? 'projectName' : 'siteName';
-    const dropId = type === 'project' ? 'projectDropdown' : 'siteDropdown';
-    document.getElementById(inputId).value = '';
-    document.getElementById(inputId).placeholder = type === 'project' ? 'e.g. New project name' : 'e.g. New site name';
-    document.getElementById(dropId).classList.remove('open');
-    document.getElementById(inputId).focus();
+    const cfg = comboConfig(type);
+    document.getElementById(cfg.inputId).value = '';
+    document.getElementById(cfg.inputId).placeholder = 'Type new project name…';
+    document.getElementById(cfg.dropId).classList.remove('open');
+    document.getElementById(cfg.inputId).focus();
   }
 
   function deleteComboOption(e, type, value) {
     e.preventDefault();
     e.stopPropagation();
-    const key = type === 'project' ? 'archProjects' : 'archSites';
-    removeFromList(key, value);
+    removeFromList(comboConfig(type).key, value);
     buildComboDropdown(type);
   }
 
@@ -1931,6 +2183,13 @@
     const recorderEl = document.getElementById('recorder');
     if (recorderEl && !recorderEl.value && currentUser) recorderEl.value = currentUser;
 
+    // Pre-fill note project from last entry
+    const noteProjectEl = document.getElementById('noteProject');
+    if (noteProjectEl && !noteProjectEl.value && entries.length > 0) {
+      const lastProject = entries[entries.length - 1].projectName;
+      if (lastProject) noteProjectEl.value = lastProject;
+    }
+
     updateBadge();
     updateUndoBtn();
     renderLatestPreview();
@@ -1961,12 +2220,14 @@
     const ta = document.getElementById('noteInput');
     const text = ta.value.trim();
     if (!text) return;
+    const project = (document.getElementById('noteProject').value || '').trim();
     setSyncStatus('saving', 'Saving…');
     const note = {
       id: Date.now(),
       text,
       ts: new Date().toISOString(),
-      author: currentUser || 'Unknown'
+      author: currentUser || 'Unknown',
+      project: project || ''
     };
     r('notes').push(note);
     ta.value = '';
@@ -1994,22 +2255,115 @@
     };
   }
 
+  // ── NOTES FILTER ─────────────────────────────────────────
+  function noteDateKey(isoTs) {
+    // Returns YYYY-MM-DD string in local time
+    const d = new Date(isoTs);
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+
+  function noteDateLabel(isoTs) {
+    return new Date(isoTs).toLocaleDateString('en-GB', {
+      weekday: 'short', day: 'numeric', month: 'long', year: 'numeric'
+    });
+  }
+
+  function updateNotesDateDropdown() {
+    const sel = document.getElementById('notesDateFilter');
+    if (!sel) return;
+    const current = sel.value;
+    const dates = [...new Set(notes.map(n => noteDateKey(n.ts)))]
+      .sort((a, b) => b.localeCompare(a));
+    sel.innerHTML = '<option value="all">All Dates</option>' +
+      dates.map(d => {
+        const label = noteDateLabel(notes.find(n => noteDateKey(n.ts) === d).ts);
+        return `<option value="${d}">${label}</option>`;
+      }).join('');
+    if (current !== 'all' && dates.includes(current)) sel.value = current;
+    else sel.value = 'all';
+
+    // Also update project filter dropdown
+    const pSel = document.getElementById('notesProjectFilter');
+    if (pSel) {
+      const currentP = pSel.value;
+      const projs = [...new Set(notes.map(n => n.project).filter(Boolean))].sort();
+      pSel.innerHTML = '<option value="all">All Projects</option>' +
+        projs.map(p => `<option value="${p}">${p}</option>`).join('');
+      if (currentP !== 'all' && projs.includes(currentP)) pSel.value = currentP;
+      else pSel.value = 'all';
+    }
+  }
+
+  function applyNotesFilter() {
+    const dateVal    = document.getElementById('notesDateFilter').value;
+    const projVal    = document.getElementById('notesProjectFilter').value;
+    const searchVal  = document.getElementById('notesSearch').value.trim().toLowerCase();
+    const bar        = document.getElementById('notesFilterBar');
+    const isFiltered = dateVal !== 'all' || projVal !== 'all' || searchVal !== '';
+    bar.classList.toggle('has-filter', isFiltered);
+
+    let filtered = [...notes];
+    if (dateVal !== 'all') {
+      filtered = filtered.filter(n => noteDateKey(n.ts) === dateVal);
+    }
+    if (projVal !== 'all') {
+      filtered = filtered.filter(n => (n.project || '') === projVal);
+    }
+    if (searchVal) {
+      filtered = filtered.filter(n =>
+        (n.text || '').toLowerCase().includes(searchVal) ||
+        (n.author || '').toLowerCase().includes(searchVal) ||
+        (n.project || '').toLowerCase().includes(searchVal)
+      );
+    }
+
+    // Update display title
+    const titleEl = document.getElementById('notesDisplayTitle');
+    const parts = [];
+    if (dateVal !== 'all') parts.push(noteDateLabel(notes.find(n => noteDateKey(n.ts) === dateVal).ts));
+    if (projVal !== 'all') parts.push(projVal);
+    if (parts.length) {
+      titleEl.textContent = `◈ ${parts.join(' · ')}`;
+    } else {
+      const now = new Date();
+      const ds = now.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+      titleEl.textContent = `◈ ${ds} — Field Log`;
+    }
+
+    renderNotesFiltered(filtered);
+  }
+
+  function clearNotesFilter() {
+    document.getElementById('notesDateFilter').value = 'all';
+    document.getElementById('notesProjectFilter').value = 'all';
+    document.getElementById('notesSearch').value = '';
+    applyNotesFilter();
+  }
+
   function renderNotes() {
+    updateNotesDateDropdown();
+    applyNotesFilter();
+  }
+
+  function renderNotesFiltered(filtered) {
     const body = document.getElementById('notesBody');
     if (notes.length === 0) {
       body.innerHTML = '<div class="notes-empty">No notes yet — start logging above</div>';
       return;
     }
-    body.innerHTML = notes.map(n => {
+    if (filtered.length === 0) {
+      body.innerHTML = '<div class="notes-empty-filter">No notes match this filter</div>';
+      return;
+    }
+    body.innerHTML = filtered.map(n => {
       const t = fmtNoteTs(n.ts);
       const safe = n.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       const initials = (function(name) {
         const parts = (name || '?').trim().split(/[\s.]+/).filter(p => /[a-zA-Z]/.test(p));
-        if (parts.length >= 2) {
-          return parts.slice(0, 3).map(w => w[0]).join('').toUpperCase();
-        } else if (parts.length === 1) {
-          return parts[0].slice(0, 2).toUpperCase();
-        }
+        if (parts.length >= 2) return parts.slice(0, 3).map(w => w[0]).join('').toUpperCase();
+        else if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
         return '?';
       })(n.author);
       return `<div class="note-entry" id="note-${n.id}">
@@ -2017,6 +2371,7 @@
           <span class="note-ts-main">${t.display}</span>
           <span class="note-ts-sub" title="${n.author || 'Unknown'}">${initials}</span>
           <span class="note-ts-date">${t.date}</span>
+          ${n.project ? `<span class="note-project-tag">${n.project}</span>` : ''}
         </div>
         <div class="note-body" id="note-body-${n.id}">${safe}</div>
         <div class="note-actions">
@@ -2136,16 +2491,17 @@
     for (let i = 1; i <= maxF; i++) {
       findingCols.push(`Finding Type`, `Finding Qty`, `Finding Description`);
     }
-    const header = csvRow(['Date','Time','Project','Site','Grid / Trench','Depth / Layer','Bag Number','Recorded By', ...findingCols]);
+    const header = csvRow(['Entry Type','Date','Time','Project','Site','Grid / Trench','Depth / Layer','Bag Number','Element Name','Recorded By', ...findingCols]);
     const rows = entries.map(e => {
       const findingCells = [];
       for (let i = 0; i < maxF; i++) {
         const f = (e.findings || [])[i];
         findingCells.push(f ? f.type : '', f ? f.count : '', f ? (f.desc || '') : '');
       }
+      const typeLabel = (e.entryType || 'material') === 'material' ? 'Material' : 'Field Element';
       return csvRow([
-        e.date || '', formatTime(e.time) || '', e.projectName || '', e.siteName || '',
-        e.gridRef || '', e.depth || '', e.bagNumber || '', e.recorder || '',
+        typeLabel, e.date || '', formatTime(e.time) || '', e.projectName || '', e.siteName || '',
+        e.gridRef || '', e.depth || '', e.bagNumber || '', e.elementName || '', e.recorder || '',
         ...findingCells
       ]);
     });
@@ -2155,10 +2511,10 @@
 
   function exportNotesCSV() {
     if (!notes.length) return;
-    const header = csvRow(['Date','Time','Author','Note']);
+    const header = csvRow(['Date','Time','Author','Project','Note']);
     const rows = [...notes].reverse().map(n => {
       const t = fmtNoteTs(n.ts);
-      return csvRow([t.date, t.reg, n.author || '', n.text || '']);
+      return csvRow([t.date, t.reg, n.author || '', n.project || '', n.text || '']);
     });
     const date = new Date().toISOString().split('T')[0];
     downloadCSV(`arqueolog-notes-${date}.csv`, [header, ...rows]);
@@ -2170,17 +2526,52 @@
     setTimeout(() => document.getElementById(id).classList.remove('show'), 3000);
   }
 
+  // ── ENTRY TYPE TOGGLE ────────────────────────────────────
+  const ENTRY_TYPE_LABELS = {
+    material: { label: 'Material', subtitle: 'Recovered artefacts, samples & physical finds' },
+    element:  { label: 'Field Element', subtitle: 'Features, structures, layers & contextual observations' }
+  };
+
+  function setEntryType(type) {
+    currentEntryType = type;
+    document.getElementById('typeBtnMaterial').classList.toggle('active', type === 'material');
+    document.getElementById('typeBtnElement').classList.toggle('active', type === 'element');
+    document.getElementById('entryTypeSubtitle').textContent = ENTRY_TYPE_LABELS[type].subtitle;
+    // Toggle bag vs element name field
+    const isMaterial = type === 'material';
+    document.getElementById('bagFieldGroup').style.display      = isMaterial ? '' : 'none';
+    document.getElementById('elementNameGroup').style.display   = isMaterial ? 'none' : '';
+    // Clear the hidden field's required hints
+    if (isMaterial) {
+      document.getElementById('elementNameRequiredHint').style.display = 'none';
+    } else {
+      document.getElementById('bagRequiredHint').style.display = 'none';
+    }
+  }
+
+  function setReportFilter(filter) {
+    currentReportFilter = filter;
+    ['All','Material','Element'].forEach(f => {
+      const btn = document.getElementById('reportTypeBtn' + f);
+      if (btn) btn.classList.toggle('active', filter === f.toLowerCase() || (f === 'All' && filter === 'all'));
+    });
+    renderReport();
+  }
+
   // ── SAVE ─────────────────────────────────────────────────
   function saveEntry() {
     const findings = collectFindings();
-    const projectVal = document.getElementById('projectName').value.trim();
-    const siteVal = document.getElementById('siteName').value.trim();
-    const bagVal = document.getElementById('bagNumber').value.trim();
+    const projectVal     = document.getElementById('projectName').value.trim();
+    const siteVal        = document.getElementById('siteName').value.trim();
+    const isMaterial     = currentEntryType === 'material';
+    const bagVal         = isMaterial ? document.getElementById('bagNumber').value.trim() : '';
+    const elementNameVal = !isMaterial ? document.getElementById('elementName').value.trim() : '';
 
     let valid = true;
     if (!projectVal) { showRequiredHint('projectRequiredHint'); valid = false; }
-    if (!siteVal) { showRequiredHint('siteRequiredHint'); valid = false; }
-    if (!bagVal) { showRequiredHint('bagRequiredHint'); valid = false; }
+    if (!siteVal)    { showRequiredHint('siteRequiredHint');    valid = false; }
+    if (isMaterial  && !bagVal)         { showRequiredHint('bagRequiredHint');         valid = false; }
+    if (!isMaterial && !elementNameVal) { showRequiredHint('elementNameRequiredHint'); valid = false; }
     if (!valid) return;
 
     if (findings.length === 0) {
@@ -2191,13 +2582,15 @@
     const entry = {
       id: 'FIND-' + String(entries.length + 1).padStart(3, '0'),
       timestamp: new Date().toISOString(),
+      entryType: currentEntryType,
       projectName: projectVal,
       siteName: siteVal,
       gridRef: document.getElementById('gridRef').value.trim(),
       date: document.getElementById('entryDate').value,
       time: document.getElementById('entryTime').value,
       depth: document.getElementById('depth').value.trim(),
-      bagNumber: bagVal,
+      bagNumber:   isMaterial ? bagVal : '',
+      elementName: !isMaterial ? elementNameVal : '',
       recorder: document.getElementById('recorder').value.trim() || currentUser || '',
       findings: findings || [],
       author: currentUser || 'Unknown'
@@ -2215,9 +2608,11 @@
     setSyncStatus('saving', 'Saving…');
     r('entries').push(entry);
 
-    // Sync bag number so all devices advance together
-    const bagNum = parseInt(bagVal);
-    if (!isNaN(bagNum)) r('lastBagNumber').transaction(cur => Math.max(cur || 0, bagNum));
+    // Sync bag number so all devices advance together (Material only)
+    if (isMaterial) {
+      const bagNum = parseInt(bagVal);
+      if (!isNaN(bagNum)) r('lastBagNumber').transaction(cur => Math.max(cur || 0, bagNum));
+    }
 
     const toast = document.getElementById('successToast');
     toast.classList.add('show');
@@ -2228,18 +2623,23 @@
     findingRowCount = 0;
     addFindingRow();
 
-    // Advance bag number display
-    const nextBag = getNextBagNumber();
-    const bagInput = document.getElementById('bagNumber');
-    bagInput.placeholder = bagVal;
-    bagInput.value = nextBag;
-    document.getElementById('bagAutoLabel').style.display = nextBag ? 'inline' : 'none';
+    if (isMaterial) {
+      // Advance bag number display
+      const nextBag = getNextBagNumber();
+      const bagInput = document.getElementById('bagNumber');
+      bagInput.placeholder = bagVal;
+      bagInput.value = nextBag;
+      document.getElementById('bagAutoLabel').style.display = nextBag ? 'inline' : 'none';
+    } else {
+      // Clear element name for next entry
+      document.getElementById('elementName').value = '';
+    }
   }
 
   // ── CLEAR FORM ───────────────────────────────────────────
   function clearForm() {
     // Clear all text fields
-    ['gridRef','depth','recorder'].forEach(id => {
+    ['gridRef','depth','recorder','elementName'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -2285,7 +2685,11 @@
     if (entries.length === 0) { preview.style.display = 'none'; return; }
     const e = entries[entries.length - 1];
     preview.style.display = 'block';
-    document.getElementById('latestTimestamp').textContent = e.id + (e.bagNumber ? ' · Bag #' + e.bagNumber : '') + (e.projectName ? ' · ' + e.projectName : '') + ' · ' + formatDate(e.date);
+    document.getElementById('latestTimestamp').textContent = e.id +
+      ((e.entryType || 'material') === 'material'
+        ? (e.bagNumber ? ' · Bag #' + e.bagNumber : '')
+        : (e.elementName ? ' · ' + e.elementName : '')) +
+      (e.projectName ? ' · ' + e.projectName : '') + ' · ' + formatDate(e.date);
     document.getElementById('latestPreviewBody').innerHTML = buildEntryCardBody(e);
   }
 
@@ -2315,6 +2719,10 @@
   }
 
   function buildEntryCardBody(e) {
+    const isMaterial = (e.entryType || 'material') === 'material';
+    const idField = isMaterial
+      ? `<div class="entry-field field-highlight-bag">${e.bagNumber ? `<div class="entry-field-label">Bag Number</div><div class="entry-field-value">#${e.bagNumber}</div>` : ''}</div>`
+      : `<div class="entry-field field-highlight-bag">${e.elementName ? `<div class="entry-field-label">Element Name</div><div class="entry-field-value">${e.elementName}</div>` : ''}</div>`;
     return `<div class="entry-card-body">
       ${buildFindingsTable(e.findings)}
       <div class="entry-field field-highlight-project">${e.projectName ? `<div class="entry-field-label">Project</div><div class="entry-field-value">${e.projectName}</div>` : ''}</div>
@@ -2323,7 +2731,7 @@
       ${field('Date', formatDate(e.date))}
       ${field('Time', formatTime(e.time))}
       ${field('Depth / Layer', e.depth)}
-      <div class="entry-field field-highlight-bag">${e.bagNumber ? `<div class="entry-field-label">Bag Number</div><div class="entry-field-value">#${e.bagNumber}</div>` : ''}</div>
+      ${idField}
       ${field('Recorded By', e.recorder)}
     </div>`;
   }
@@ -2344,39 +2752,55 @@
 
     hint.style.display = 'block';
 
-    const sites = [...new Set(entries.map(e => e.siteName).filter(Boolean))];
-    const projects = [...new Set(entries.map(e => e.projectName).filter(Boolean))];
-    const finders = [...new Set(entries.map(e => e.recorder).filter(Boolean))];
-    const totalFindings = entries.reduce((sum, e) => sum + (e.findings ? e.findings.filter(f => f.type && f.type !== 'No significant finds').length : 0), 0);
-    const reportDate = entries[0].date ? formatDate(entries[0].date) : new Date().toLocaleDateString();
+    // Apply type filter
+    const filtered = currentReportFilter === 'all'
+      ? entries
+      : entries.filter(e => (e.entryType || 'material') === currentReportFilter);
+
+    const materialCount = entries.filter(e => (e.entryType || 'material') === 'material').length;
+    const elementCount  = entries.filter(e => (e.entryType || 'material') === 'element').length;
+
+    const sites    = [...new Set(filtered.map(e => e.siteName).filter(Boolean))];
+    const projects = [...new Set(filtered.map(e => e.projectName).filter(Boolean))];
+    const finders  = [...new Set(filtered.map(e => e.recorder).filter(Boolean))];
+    const totalFindings = filtered.reduce((sum, e) => sum + (e.findings ? e.findings.filter(f => f.type && f.type !== 'No significant finds').length : 0), 0);
+    const reportDate  = entries[0].date ? formatDate(entries[0].date) : new Date().toLocaleDateString();
     const projectLabel = projects.length > 0 ? projects.join(', ') : 'Field Report';
 
     let html = `<div class="report-document">
       <div class="report-header">
         <div class="report-header-title">Arqueo Findings</div>
-        <div class="report-header-meta">${projectLabel} &nbsp;·&nbsp; ${reportDate} &nbsp;·&nbsp; ${entries.length} Log ${entries.length === 1 ? 'Entry' : 'Entries'}</div>
+        <div class="report-header-meta">${projectLabel} &nbsp;·&nbsp; ${reportDate} &nbsp;·&nbsp; ${filtered.length} Log ${filtered.length === 1 ? 'Entry' : 'Entries'}</div>
       </div>
       <div class="report-body">
         <div class="report-summary-grid" style="grid-template-columns:repeat(5,1fr)">
-          <div class="summary-stat"><div class="summary-stat-num">${entries.length}</div><div class="summary-stat-label">Log Entries</div></div>
-          <div class="summary-stat"><div class="summary-stat-num">${projects.length || '—'}</div><div class="summary-stat-label">Projects</div></div>
-          <div class="summary-stat"><div class="summary-stat-num">${sites.length || '—'}</div><div class="summary-stat-label">Sites</div></div>
+          <div class="summary-stat"><div class="summary-stat-num">${filtered.length}</div><div class="summary-stat-label">${currentReportFilter === 'all' ? 'Total Entries' : (currentReportFilter === 'material' ? 'Materials' : 'Field Elements')}</div></div>
+          <div class="summary-stat"><div class="summary-stat-num">${materialCount}</div><div class="summary-stat-label">Materials</div></div>
+          <div class="summary-stat"><div class="summary-stat-num">${elementCount}</div><div class="summary-stat-label">Field Elements</div></div>
           <div class="summary-stat"><div class="summary-stat-num">${totalFindings}</div><div class="summary-stat-label">Total Finds</div></div>
           <div class="summary-stat"><div class="summary-stat-num">${finders.length || '—'}</div><div class="summary-stat-label">Log Recorders</div></div>
         </div>`;
 
-    entries.forEach((e, i) => {
+    if (filtered.length === 0) {
+      html += `<div class="empty-state" style="margin:24px 0"><div class="empty-state-icon">⛏</div><div class="empty-state-text">No ${currentReportFilter === 'material' ? 'Material' : 'Field Element'} entries yet</div></div>`;
+    }
+
+    filtered.forEach((e, i) => {
+      const type = e.entryType || 'material';
+      const typeLabel = type === 'material' ? 'Material' : 'Field Element';
       const cardTitle = e.projectName
         ? `<strong style="font-size:13px;font-family:'Playfair Display',serif;color:var(--earth-dark)">${e.projectName}</strong>`
         : `<span style="color:var(--stone);font-size:11px">No Project</span>`;
-      const bagLabel = e.bagNumber
-        ? `<strong style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--sienna)">Bag #${e.bagNumber}</strong>`
-        : '';
+      const idLabel = type === 'material'
+        ? (e.bagNumber ? `<strong style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--sienna)">Bag #${e.bagNumber}</strong>` : '')
+        : (e.elementName ? `<strong style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#4a6b8a">${e.elementName}</strong>` : '');
+      const typeBadge = `<span class="entry-type-badge ${type}">${typeLabel}</span>`;
+      const globalIdx = entries.indexOf(e);
       html += `<div class="entry-card">
         <div class="entry-card-header">
-          <span class="entry-card-id">${cardTitle}${bagLabel ? ' &nbsp;·&nbsp; ' + bagLabel : ''}</span>
+          <span class="entry-card-id">${cardTitle}${idLabel ? ' &nbsp;·&nbsp; ' + idLabel : ''}${typeBadge}</span>
           <span class="entry-card-time">${formatDate(e.date)}${e.time ? ' · ' + formatTime(e.time) : ''}</span>
-          <button class="btn-danger" onclick="deleteEntry(${i})">Remove</button>
+          <button class="btn-danger" onclick="deleteEntry(${globalIdx})">Remove</button>
         </div>
         ${buildEntryCardBody(e)}
       </div>`;
