@@ -996,6 +996,11 @@
 
   .note-entry:hover .note-actions { opacity: 1; }
 
+  /* Always show on touch devices — no hover available */
+  @media (hover: none) {
+    .note-actions { opacity: 1; }
+  }
+
   .note-action-btn {
     background: none;
     border: 1px solid var(--sand-dark);
